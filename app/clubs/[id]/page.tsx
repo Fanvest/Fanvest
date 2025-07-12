@@ -614,14 +614,15 @@ export default function ClubDetailPage() {
                         {/* Options et résultats */}
                         <div className="space-y-3">
                           {results.map(option => (
-                            <div key={option.id} className="relative">
+                            <div key={option.id} className="relative group">
                               {/* Barre de progression */}
                               <div className="bg-[#330051]/50 rounded-lg overflow-hidden">
                                 <div 
                                   className="bg-gradient-to-r from-[#FA0089]/30 to-[#FA0089]/60 h-12 transition-all duration-500 flex items-center"
                                   style={{ width: `${Math.max(option.percentage, 2)}%` }}
                                 >
-                                  <div className="pl-4 text-sm font-medium">
+                                  {/* Texte des tokens visible uniquement au survol */}
+                                  <div className="pl-4 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                     {option.votes} tokens ({option.percentage.toFixed(1)}%)
                                   </div>
                                 </div>
@@ -640,6 +641,11 @@ export default function ClubDetailPage() {
                                     Voter ({userTokens} tokens)
                                   </button>
                                 )}
+                              </div>
+
+                              {/* Tooltip au survol pour afficher les détails */}
+                              <div className="absolute -top-2 left-4 bg-[#330051] border border-[#FA0089] rounded px-2 py-1 text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">
+                                {option.votes} tokens ({option.percentage.toFixed(1)}%)
                               </div>
                             </div>
                           ))}
