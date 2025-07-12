@@ -566,11 +566,6 @@ export default function ClubDetailPage() {
                 <h2 className="text-2xl font-bold flex items-center gap-3">
                   📊 Sondages en cours
                 </h2>
-                {authenticated && (
-                  <div className="text-sm text-[#FEFEFE]/60">
-                    Vos tokens: {userTokens}
-                  </div>
-                )}
               </div>
 
               {pollsLoading ? (
@@ -638,7 +633,7 @@ export default function ClubDetailPage() {
                                     onClick={() => vote(poll.id, option.id)}
                                     className="bg-[#FA0089] hover:bg-[#FA0089]/80 px-4 py-1 rounded text-sm font-semibold transition ml-4"
                                   >
-                                    Voter ({userTokens} tokens)
+                                    Voter
                                   </button>
                                 )}
                               </div>
