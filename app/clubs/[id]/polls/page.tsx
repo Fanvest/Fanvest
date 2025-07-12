@@ -338,7 +338,7 @@ export default function ClubPollsPage() {
                   </div>
                   
                   {/* Actions */}
-                  {activeTab === 'active' && poll.status === 'ACTIVE' && (expired || hasVoted) && (
+                  {activeTab === 'active' && poll.status === 'ACTIVE' && (
                     <button
                       onClick={() => closePoll(poll.id)}
                       className="bg-orange-500 hover:bg-orange-400 px-4 py-2 rounded-lg text-sm font-semibold transition"
