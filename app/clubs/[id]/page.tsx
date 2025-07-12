@@ -100,8 +100,13 @@ export default function ClubDetailPage() {
   }, [params.id]);
 
   useEffect(() => {
-    if (authenticated && polls.length > 0) {
+    if (club) {
       loadUserTokens();
+    }
+  }, [authenticated, club]);
+
+  useEffect(() => {
+    if (authenticated && polls.length > 0) {
       loadUserVotes();
     }
   }, [authenticated, polls]);
@@ -189,9 +194,22 @@ export default function ClubDetailPage() {
   };
 
   const loadUserTokens = async () => {
-    // Simuler le nombre de tokens de l'utilisateur
-    // Dans un vrai système, cela viendrait de la blockchain
-    setUserTokens(50); // Par défaut 50 tokens pour la démo
+    if (!club?.tokenAddress) {
+      setUserTokens(0);
+      return;
+    }
+    
+    // Pour la démo, simuler selon le statut d'authentification
+    // Dans un vrai système, cela viendrait de la blockchain via le tokenAddress
+    if (authenticated) {
+      // Simuler différents niveaux de tokens selon l'utilisateur
+      const userId = user?.id || '';
+      const tokenCount = userId.length % 3 === 0 ? 100 : 
+                        userId.length % 3 === 1 ? 25 : 50;
+      setUserTokens(tokenCount);
+    } else {
+      setUserTokens(0);
+    }
   };
 
   const loadUserVotes = async () => {
@@ -242,6 +260,9 @@ export default function ClubDetailPage() {
           [pollId]: { optionId, tokenPower: userTokens.toString() }
         }));
         
+        // Recharger les résultats en temps réel
+        loadPollResults(pollId);
+        
         // Recharger les sondages pour avoir les nouveaux totaux
         loadPolls();
       }
@@ -262,24 +283,50 @@ export default function ClubDetailPage() {
            !userVotes[poll.id];
   };
 
+  const [pollResults, setPollResults] = useState<{ [pollId: string]: any }>({});
+
+  const loadPollResults = async (pollId: string) => {
+    try {
+      const response = await fetch(`/api/polls/${pollId}/results`);
+      if (response.ok) {
+        const data = await response.json();
+        setPollResults(prev => ({
+          ...prev,
+          [pollId]: data
+        }));
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement des résultats:', error);
+    }
+  };
+
   const calculateResults = (poll: Poll) => {
-    const totalTokens = parseInt(poll.club.totalSupply || '0');
-    if (totalTokens === 0) return { totalVotes: 0, results: [] };
-
-    // Simuler les résultats en fonction des votes
-    const results = poll.options.map(option => {
-      // Dans un vrai système, on calculerait le total des tokenPower pour chaque option
-      const votes = Math.floor(Math.random() * (totalTokens / 4)); // Simulation
+    const results = pollResults[poll.id];
+    if (!results) {
+      // Charger les résultats si pas encore disponibles
+      loadPollResults(poll.id);
+      
+      // Retourner des données temporaires en attendant
       return {
-        ...option,
-        votes,
-        percentage: totalTokens > 0 ? (votes / totalTokens) * 100 : 0
+        totalVotes: 0,
+        results: poll.options.map(option => ({
+          ...option,
+          votes: 0,
+          percentage: 0
+        }))
       };
-    });
+    }
 
-    const totalVotes = results.reduce((sum, result) => sum + result.votes, 0);
-    
-    return { totalVotes, results };
+    return {
+      totalVotes: results.totalTokensVoted,
+      results: results.results.map((result: any) => ({
+        id: result.id,
+        text: result.text,
+        order: result.order,
+        votes: result.tokenVotes,
+        percentage: result.percentage
+      }))
+    };
   };
 
   const formatDate = (dateString: string) => {
@@ -560,7 +607,7 @@ export default function ClubDetailPage() {
                           <h3 className="text-xl font-bold mb-2">{poll.title}</h3>
                           <p className="text-[#FEFEFE]/80 mb-3">{poll.description}</p>
                           <div className="text-sm text-[#FEFEFE]/60">
-                            Fin: {formatDate(poll.endDate)} • Min: {poll.minTokens} tokens • {totalVotes} tokens votants
+                            Fin: {formatDate(poll.endDate)} • Min: {poll.minTokens} tokens • {totalVotes} tokens exprimés
                           </div>
                         </div>
 
@@ -597,6 +644,30 @@ export default function ClubDetailPage() {
                             </div>
                           ))}
                         </div>
+
+                        {/* Résumé des résultats */}
+                        {pollResults[poll.id] && (
+                          <div className="mt-4 p-4 bg-[#330051]/30 rounded-lg">
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center text-sm">
+                              <div>
+                                <div className="font-bold text-[#FA0089]">{pollResults[poll.id].totalTokensVoted}</div>
+                                <div className="text-[#FEFEFE]/60">Tokens votés</div>
+                              </div>
+                              <div>
+                                <div className="font-bold text-[#FA0089]">{pollResults[poll.id].totalVoters}</div>
+                                <div className="text-[#FEFEFE]/60">Votants</div>
+                              </div>
+                              <div>
+                                <div className="font-bold text-[#FA0089]">{pollResults[poll.id].participationRate?.toFixed(1)}%</div>
+                                <div className="text-[#FEFEFE]/60">Participation</div>
+                              </div>
+                              <div>
+                                <div className="font-bold text-[#FA0089]">{pollResults[poll.id].totalSupply}</div>
+                                <div className="text-[#FEFEFE]/60">Tokens total</div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
 
                         {/* Message si ne peut pas voter */}
                         {poll.status === 'ACTIVE' && !canVote(poll) && !hasVoted && (
