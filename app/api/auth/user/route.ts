@@ -6,12 +6,12 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const privyId = searchParams.get('privyId');
-    const walletAddress = searchParams.get('walletAddress');
-    const email = searchParams.get('email');
 
-    if (!privyId || !walletAddress) {
+    console.log('Auth request for privyId:', privyId);
+
+    if (!privyId) {
       return NextResponse.json(
-        { error: 'Missing privyId or walletAddress' },
+        { error: 'Missing privyId' },
         { status: 400 }
       );
     }
@@ -27,29 +27,16 @@ export async function GET(request: NextRequest) {
             logo: true,
             location: true
           }
-        },
-        tokenHoldings: {
-          include: {
-            club: {
-              select: {
-                id: true,
-                name: true,
-                logo: true,
-                tokenSymbol: true
-              }
-            }
-          }
         }
       }
     });
 
     if (!user) {
-      // Create new user
+      // Create new user with just privyId (Privy manages the rest)
+      console.log('Creating new user with privyId:', privyId);
       user = await prisma.user.create({
         data: {
-          privyId,
-          walletAddress,
-          email
+          privyId
         },
         include: {
           clubs: {
@@ -59,51 +46,10 @@ export async function GET(request: NextRequest) {
               logo: true,
               location: true
             }
-          },
-          tokenHoldings: {
-            include: {
-              club: {
-                select: {
-                  id: true,
-                  name: true,
-                  logo: true,
-                  tokenSymbol: true
-                }
-              }
-            }
           }
         }
       });
-    } else {
-      // Update wallet address if it changed
-      if (user.walletAddress !== walletAddress) {
-        user = await prisma.user.update({
-          where: { id: user.id },
-          data: { walletAddress },
-          include: {
-            clubs: {
-              select: {
-                id: true,
-                name: true,
-                logo: true,
-                location: true
-              }
-            },
-            tokenHoldings: {
-              include: {
-                club: {
-                  select: {
-                    id: true,
-                    name: true,
-                    logo: true,
-                    tokenSymbol: true
-                  }
-                }
-              }
-            }
-          }
-        });
-      }
+      console.log('Created user:', user.privyId);
     }
 
     return NextResponse.json(user);
@@ -134,10 +80,9 @@ export async function PATCH(request: NextRequest) {
     if (profileImage !== undefined) updateData.profileImage = profileImage;
 
     const user = await prisma.user.update({
-      where: { id: userId },
+      where: { privyId: userId },
       data: updateData,
       select: {
-        id: true,
         privyId: true,
         email: true,
         walletAddress: true,

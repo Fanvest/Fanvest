@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
       include: {
         user: {
           select: {
-            id: true,
+            privyId: true,
             email: true,
             walletAddress: true,
             profileImage: true
@@ -47,7 +47,6 @@ export async function POST(request: NextRequest) {
       location,
       description,
       founded,
-      tier,
       legalDocuments, // Array of document URLs/base64
       contactEmail,
       phoneNumber,
@@ -87,7 +86,6 @@ export async function POST(request: NextRequest) {
         location,
         description,
         founded,
-        tier: tier || 'AMATEUR',
         legalDocuments: JSON.stringify(legalDocuments || []),
         contactEmail,
         phoneNumber,
@@ -98,7 +96,7 @@ export async function POST(request: NextRequest) {
       include: {
         user: {
           select: {
-            id: true,
+            privyId: true,
             email: true,
             walletAddress: true,
             profileImage: true
@@ -151,7 +149,6 @@ async function approveClubRequest(requestId: string) {
       location: clubRequest.location,
       description: clubRequest.description,
       founded: clubRequest.founded,
-      tier: clubRequest.tier,
       ownerId: clubRequest.userId
     }
   });
@@ -167,7 +164,7 @@ async function approveClubRequest(requestId: string) {
     include: {
       user: {
         select: {
-          id: true,
+          privyId: true,
           email: true,
           walletAddress: true,
           profileImage: true

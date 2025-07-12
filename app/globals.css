@@ -1,1 +1,12 @@
 @import "tailwindcss";
+
+/* Glowing Effect Custom Styles */
+:root {
+  --black: #000000;
+}
+
+.glow::after {
+  background-attachment: fixed;
+  background-origin: border-box;
+  background-size: 100% 100%;
+}

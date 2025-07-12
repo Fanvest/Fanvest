@@ -8,15 +8,14 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = "file:./dev.db"
+  url      = "file:./prisma/dev.db"
 }
 
 // User model - linked to Privy authentication
 model User {
-  id            String   @id @default(cuid())
-  privyId       String   @unique
+  privyId       String   @id
   email         String?
-  walletAddress String
+  walletAddress String?
   profileImage  String?  // URL to profile picture
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -38,7 +37,6 @@ model Club {
   description  String?
   logo         String?  // URL to club logo
   founded      Int?
-  tier         ClubTier @default(AMATEUR)
   
   // Blockchain data
   tokenAddress String?
@@ -46,11 +44,16 @@ model Club {
   totalSupply  String?  // BigInt as string
   pricePerToken String? // BigInt as string
   
+  // Token 3D design data
+  tokenTexture     String?  // Base64 or URL to texture image
+  tokenBandColor   String?  // Hex color for the band
+  tokenAnimation   Boolean? @default(true) // Animation enabled
+  
   // Metadata
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   ownerId      String
-  owner        User     @relation(fields: [ownerId], references: [id])
+  owner        User     @relation(fields: [ownerId], references: [privyId])
 
   // Relations
   polls        Poll[]
@@ -108,7 +111,7 @@ model PollResponse {
   
   // Relations
   userId    String
-  user      User       @relation(fields: [userId], references: [id])
+  user      User       @relation(fields: [userId], references: [privyId])
   pollId    String
   poll      Poll       @relation(fields: [pollId], references: [id])
   optionId  String
@@ -130,7 +133,7 @@ model Vote {
   
   // Relations
   userId        String
-  user          User      @relation(fields: [userId], references: [id])
+  user          User      @relation(fields: [userId], references: [privyId])
   clubId        String
   club          Club      @relation(fields: [clubId], references: [id])
 
@@ -164,7 +167,6 @@ model ClubRequest {
   location        String
   description     String?
   founded         Int?
-  tier            ClubTier          @default(AMATEUR)
   
   // Contact information
   contactEmail    String
@@ -184,7 +186,7 @@ model ClubRequest {
   
   // Relations
   userId          String
-  user            User              @relation(fields: [userId], references: [id])
+  user            User              @relation(fields: [userId], references: [privyId])
   clubId          String?           // Set when approved
   club            Club?             @relation(fields: [clubId], references: [id])
 
@@ -192,11 +194,6 @@ model ClubRequest {
 }
 
 // Enums
-enum ClubTier {
-  AMATEUR
-  SEMI_PRO
-  GRASSROOTS
-}
 
 enum PollType {
   GOVERNANCE

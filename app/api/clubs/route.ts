@@ -1,13 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/database';
-import { ClubTier } from '@/lib/generated/prisma';
 
 // GET /api/clubs - Get all clubs or search clubs
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const search = searchParams.get('search');
-    const tier = searchParams.get('tier') as ClubTier | null;
     const ownerId = searchParams.get('ownerId');
 
     const where: any = {};
@@ -19,19 +17,17 @@ export async function GET(request: NextRequest) {
       ];
     }
     
-    if (tier) where.tier = tier;
     if (ownerId) where.ownerId = ownerId;
 
     const clubs = await prisma.club.findMany({
       where,
       include: {
         owner: {
-          select: { id: true, walletAddress: true, profileImage: true }
+          select: { privyId: true, walletAddress: true, profileImage: true }
         },
         _count: {
           select: {
-            polls: true,
-            tokenHoldings: true
+            polls: true
           }
         }
       },
@@ -57,7 +53,6 @@ export async function POST(request: NextRequest) {
       location, 
       description, 
       founded, 
-      tier, 
       ownerId 
     } = body;
 
@@ -88,12 +83,11 @@ export async function POST(request: NextRequest) {
         location,
         description,
         founded,
-        tier: tier || ClubTier.AMATEUR,
         ownerId
       },
       include: {
         owner: {
-          select: { id: true, walletAddress: true, profileImage: true }
+          select: { privyId: true, walletAddress: true, profileImage: true }
         }
       }
     });
