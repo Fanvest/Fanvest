@@ -49,6 +49,9 @@ model Club {
   tokenBandColor   String?  // Hex color for the band
   tokenAnimation   Boolean? @default(true) // Animation enabled
   
+  // Social media links
+  socialLinks      String?  // JSON string with social media links
+  
   // Metadata
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -107,6 +110,7 @@ model PollOption {
 // Poll responses - user votes on polls
 model PollResponse {
   id        String     @id @default(cuid())
+  tokenPower String    @default("1") // Voting power based on tokens held
   createdAt DateTime   @default(now())
   
   // Relations

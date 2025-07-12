@@ -1,25 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/database';
+import { PrismaClient } from '@/lib/generated/prisma';
+
+const prisma = new PrismaClient();
 
 // POST /api/polls/[id]/vote - Vote on a poll
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id: pollId } = await params;
     const body = await request.json();
-    const { userId, optionId } = body;
+    const { userId, optionId, tokenPower } = body;
 
-    if (!userId || !optionId) {
+    if (!userId || !optionId || !tokenPower) {
       return NextResponse.json(
-        { error: 'Missing userId or optionId' },
+        { error: 'Missing userId, optionId, or tokenPower' },
         { status: 400 }
       );
     }
 
     // Check if poll exists and is active
     const poll = await prisma.poll.findUnique({
-      where: { id: params.id },
+      where: { id: pollId },
       include: {
         options: true
       }
@@ -62,7 +65,7 @@ export async function POST(
       where: {
         userId_pollId: {
           userId,
-          pollId: params.id
+          pollId
         }
       }
     });
@@ -73,11 +76,12 @@ export async function POST(
         where: {
           userId_pollId: {
             userId,
-            pollId: params.id
+            pollId
           }
         },
         data: {
-          optionId
+          optionId,
+          tokenPower
         },
         include: {
           option: true,
@@ -93,8 +97,9 @@ export async function POST(
       const response = await prisma.pollResponse.create({
         data: {
           userId,
-          pollId: params.id,
-          optionId
+          pollId,
+          optionId,
+          tokenPower
         },
         include: {
           option: true,
@@ -118,9 +123,10 @@ export async function POST(
 // GET /api/polls/[id]/vote - Get user's vote for a poll
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id: pollId } = await params;
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId');
 
@@ -135,7 +141,7 @@ export async function GET(
       where: {
         userId_pollId: {
           userId,
-          pollId: params.id
+          pollId
         }
       },
       include: {

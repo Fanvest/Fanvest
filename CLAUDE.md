@@ -54,6 +54,13 @@ FanStock - A decentralized platform enabling grassroots and amateur sports clubs
 - Animation controls
 - Database persistence of 3D designs
 
+✅ **Comprehensive Polling System**
+- Token-weighted voting (vote power = tokens held)
+- Poll creation with deadlines and minimum token requirements
+- Active/archived poll management
+- Manual poll closure and automatic expiration
+- Real-time results visualization with progress bars
+
 ## Current Tech Stack
 
 ### Frontend Framework
@@ -145,15 +152,22 @@ frontend/
 │   │   │   └── [id]/
 │   │   │       ├── token3d/  # 3D token design API
 │   │   │       └── settings/ # Club settings API
-│   │   ├── polls/         # Poll management
+│   │   ├── polls/         # Poll management with token-weighted voting
+│   │   │   └── [id]/
+│   │   │       ├── vote/     # Vote API with tokenPower
+│   │   │       └── results/  # Weighted results calculation
 │   │   ├── votes/         # Blockchain vote recording
 │   │   └── upload/        # File upload (profile pics, logos)
 │   ├── clubs/             # Club-related pages
 │   │   └── [id]/
+│   │       ├── page.tsx      # Public club page with social links
 │   │       ├── create-token/ # Token creation interface
+│   │       ├── polls/        # Poll management interface
+│   │       │   ├── page.tsx  # Poll listing (active/archived)
+│   │       │   └── create/   # Poll creation form
 │   │       └── settings/     # Club settings with 3D creator
 │   ├── dashboard/         # User dashboard
-│   │   └── club/          # Club owner dashboard
+│   │   └── club/          # Club owner dashboard with poll navigation
 │   ├── explore/           # Club discovery page
 │   └── register-club/     # Club registration form
 ├── components/            # Reusable components
@@ -176,13 +190,15 @@ frontend/
 ### Database Schema (Current)
 ```sql
 Users          # Privy authentication + profile (privyId as PK)
-Clubs          # Club metadata + 3D token design data
+Clubs          # Club metadata + 3D token design data + social links
   - tokenTexture     # Base64 texture image
   - tokenBandColor   # Hex color for band
   - tokenAnimation   # Animation enabled/disabled
-Polls          # Off-chain governance polls
+  - socialLinks      # JSON string with social media links
+Polls          # Off-chain governance polls with token requirements
 PollOptions    # Poll choices
-PollResponses  # User votes on polls
+PollResponses  # User votes with tokenPower field
+  - tokenPower       # Voting weight based on token holdings
 Votes          # Governance vote records
 Revenues       # Revenue tracking
 ClubRequests   # Registration requests (auto-approved for demo)
@@ -235,6 +251,38 @@ ClubRequests   # Registration requests (auto-approved for demo)
 - **Description**: Save 3D token design data
 - **Body Parameters**: `texture`, `bandColor`, `animationEnabled`
 - **Response**: Updated club with 3D settings
+
+#### **Club Settings Routes**
+
+**GET `/api/clubs/[id]/settings`**
+- **Description**: Get club settings including social links
+- **Response**: Club information with parsed social links
+
+**PUT `/api/clubs/[id]/settings`**
+- **Description**: Update club settings
+- **Body Parameters**: `clubName`, `description`, `socialLinks` (JSON)
+- **Response**: Updated club information
+
+#### **Polling System Routes**
+
+**GET `/api/polls`**
+- **Description**: Get polls with filtering
+- **Query Parameters**: `clubId`, `status`
+- **Response**: Array of polls with vote counts and token power
+
+**POST `/api/polls`**
+- **Description**: Create new poll
+- **Body Parameters**: `title`, `description`, `pollType`, `endDate`, `minTokens`, `clubId`, `options`
+- **Response**: Created poll with options
+
+**POST `/api/polls/[id]/vote`**
+- **Description**: Vote on poll with token weight
+- **Body Parameters**: `userId`, `optionId`, `tokenPower`
+- **Response**: Vote response with update status
+
+**GET `/api/polls/[id]/results`**
+- **Description**: Get weighted poll results
+- **Response**: Detailed results with token-based calculations
 
 ### UI Design System
 
@@ -295,6 +343,19 @@ ClubRequests   # Registration requests (auto-approved for demo)
 - Real-time statistics display
 - Club cards with token information
 - Navigation to individual club pages
+
+### **7. Club Public Pages**
+- Complete club profile with description and logo
+- Social media integration (Facebook, Instagram, Website)
+- 3D token visualization with uploaded textures
+- Token information and investment options
+
+### **8. Polling System**
+- Poll creation with multiple types (governance, coach selection, etc.)
+- Token-weighted voting (50 tokens = 50 vote weight)
+- Active/archived poll management
+- Real-time results with progress bars
+- Deadline management and manual closure
 
 ## Chiliz Chain Integration
 - Chain ID: 88888 (mainnet) / 88882 (testnet)

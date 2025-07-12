@@ -1,15 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/database';
+import { PrismaClient } from '@/lib/generated/prisma';
+
+const prisma = new PrismaClient();
 import { PollStatus } from '@/lib/generated/prisma';
 
 // GET /api/polls/[id] - Get specific poll with details
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id: pollId } = await params;
     const poll = await prisma.poll.findUnique({
-      where: { id: params.id },
+      where: { id: pollId },
       include: {
         club: {
           select: { id: true, name: true, logo: true }
@@ -55,9 +58,10 @@ export async function GET(
 // PATCH /api/polls/[id] - Update poll status
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id: pollId } = await params;
     const body = await request.json();
     const { status } = body;
 
@@ -69,7 +73,7 @@ export async function PATCH(
     }
 
     const poll = await prisma.poll.update({
-      where: { id: params.id },
+      where: { id: pollId },
       data: { status },
       include: {
         club: {

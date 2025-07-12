@@ -39,24 +39,42 @@ export default function ClubSettingsPage() {
     animationEnabled: true
   });
 
-  // Charger les données 3D existantes
+  // Charger les données du club et 3D
   useEffect(() => {
-    const loadToken3DData = async () => {
+    const loadClubData = async () => {
       try {
-        const response = await fetch(`/api/clubs/${params.id}/token3d`);
-        if (response.ok) {
-          const data = await response.json();
-          if (data.tokenData) {
-            setToken3DData(data.tokenData);
+        // Charger les paramètres du club
+        const settingsResponse = await fetch(`/api/clubs/${params.id}/settings`);
+        if (settingsResponse.ok) {
+          const settingsData = await settingsResponse.json();
+          setFormData({
+            clubName: settingsData.clubName || '',
+            description: settingsData.description || '',
+            logo: null,
+            logoPreview: settingsData.logo || '',
+            socialLinks: settingsData.socialLinks || {
+              facebook: '',
+              instagram: '',
+              website: ''
+            }
+          });
+        }
+        
+        // Charger les données 3D du token
+        const token3DResponse = await fetch(`/api/clubs/${params.id}/token3d`);
+        if (token3DResponse.ok) {
+          const token3DData = await token3DResponse.json();
+          if (token3DData.tokenData) {
+            setToken3DData(token3DData.tokenData);
           }
         }
       } catch (error) {
-        console.error('Erreur lors du chargement des données 3D:', error);
+        console.error('Erreur lors du chargement des données:', error);
       }
     };
 
     if (params.id) {
-      loadToken3DData();
+      loadClubData();
     }
   }, [params.id]);
 
@@ -120,16 +138,43 @@ export default function ClubSettingsPage() {
     setIsSaving(true);
 
     try {
-      // TODO: Implémenter la sauvegarde des paramètres
-      console.log('Saving club settings:', {
-        clubId: params.id,
-        ...formData
+      // Préparer les données à sauvegarder
+      const saveData: any = {
+        clubName: formData.clubName,
+        description: formData.description,
+        socialLinks: formData.socialLinks
+      };
+
+      // Ajouter le logo s'il y en a un nouveau
+      if (formData.logo) {
+        const reader = new FileReader();
+        const logoBase64 = await new Promise<string>((resolve) => {
+          reader.onload = (e) => resolve(e.target?.result as string);
+          reader.readAsDataURL(formData.logo!);
+        });
+        saveData.logo = logoBase64;
+      }
+
+      console.log('📤 Sending data to API:', saveData);
+
+      // Sauvegarder via l'API
+      const response = await fetch(`/api/clubs/${params.id}/settings`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(saveData)
       });
 
-      // Simuler un délai pour la démo
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      console.log('📥 API Response:', response.status, response.ok);
 
-      setSuccessMessage('Paramètres sauvegardés avec succès !');
+      if (response.ok) {
+        setSuccessMessage('Paramètres sauvegardés avec succès !');
+        setError(null);
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error || 'Erreur lors de la sauvegarde');
+      }
       
     } catch (err: any) {
       setError(err.message || 'Erreur lors de la sauvegarde');

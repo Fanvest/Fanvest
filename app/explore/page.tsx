@@ -219,7 +219,10 @@ export default function ExplorePage() {
                   </div>
 
                   <div className="flex gap-2">
-                    <button className="flex-1 bg-[#813066] hover:bg-[#813066]/80 px-4 py-2 rounded-lg font-semibold transition text-sm">
+                    <button 
+                      onClick={() => window.location.href = `/clubs/${club.id}`}
+                      className="flex-1 bg-[#813066] hover:bg-[#813066]/80 px-4 py-2 rounded-lg font-semibold transition text-sm"
+                    >
                       Voir Détails
                     </button>
                     {stats.hasToken && (

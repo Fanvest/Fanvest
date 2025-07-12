@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/database';
+import { PrismaClient } from '@/lib/generated/prisma';
+
+const prisma = new PrismaClient();
 import { PollType, PollStatus } from '@/lib/generated/prisma';
 
 // GET /api/polls - Get all polls or polls for a specific club

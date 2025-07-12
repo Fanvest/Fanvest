@@ -244,10 +244,21 @@ const TokenCreator3D: React.FC<TokenCreator3DProps> = ({
             camera={{ position: [0, 0, 8], fov: 75 }}
             style={{ background: 'transparent' }}
           >
-            {/* Éclairage dramatique */}
-            <ambientLight intensity={0.1} color="#ffffff" />
-            <directionalLight position={[-12, 15, 8]} intensity={1.8} color="#ffffff" castShadow />
-            <pointLight position={[-8, 12, 6]} intensity={0.6} color="#ffffff" />
+            {/* Éclairage conditionnel */}
+            {animationEnabled ? (
+              <>
+                {/* Éclairage dramatique avec animation */}
+                <ambientLight intensity={0.1} color="#ffffff" />
+                <directionalLight position={[-12, 15, 8]} intensity={1.8} color="#ffffff" castShadow />
+                <pointLight position={[-8, 12, 6]} intensity={0.6} color="#ffffff" />
+              </>
+            ) : (
+              <>
+                {/* Éclairage simple et statique */}
+                <ambientLight intensity={0.4} color="#ffffff" />
+                <directionalLight position={[5, 5, 5]} intensity={1.0} color="#ffffff" />
+              </>
+            )}
             
             {/* Pièce de monnaie */}
             <Suspense fallback={null}>

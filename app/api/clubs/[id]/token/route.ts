@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/database';
+import { PrismaClient } from '@/lib/generated/prisma';
+
+const prisma = new PrismaClient();
 
 // PATCH /api/clubs/[id]/token - Update club with token contract info
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id: clubId } = await params;
     const body = await request.json();
     const { 
       tokenAddress, 
@@ -26,7 +29,7 @@ export async function PATCH(
 
     // Check if club exists
     const existingClub = await prisma.club.findUnique({
-      where: { id: params.id }
+      where: { id: clubId }
     });
 
     if (!existingClub) {
@@ -46,7 +49,7 @@ export async function PATCH(
 
     // Update club with token information
     const updatedClub = await prisma.club.update({
-      where: { id: params.id },
+      where: { id: clubId },
       data: {
         tokenAddress,
         tokenSymbol,
@@ -62,7 +65,7 @@ export async function PATCH(
 
     // Log the token creation event
     console.log(`Token created for club ${updatedClub.name}:`, {
-      clubId: params.id,
+      clubId,
       tokenAddress,
       tokenSymbol,
       totalSupply,
@@ -80,7 +83,7 @@ export async function PATCH(
             source: 'OTHER',
             description: `Token contract created: ${tokenSymbol}`,
             transactionHash,
-            clubId: params.id,
+            clubId,
             distributed: false
           }
         });
@@ -108,11 +111,12 @@ export async function PATCH(
 // GET /api/clubs/[id]/token - Get club token information
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id: clubId } = await params;
     const club = await prisma.club.findUnique({
-      where: { id: params.id },
+      where: { id: clubId },
       select: {
         id: true,
         name: true,

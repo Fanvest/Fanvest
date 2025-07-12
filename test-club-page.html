@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Club Page</title>
+</head>
+<body>
+    <h1>Test de la page club</h1>
+    
+    <h2>1. Test des API</h2>
+    <button onclick="testSettings()">Tester Settings API</button>
+    <button onclick="testToken3D()">Tester Token3D API</button>
+    
+    <h2>2. Résultats</h2>
+    <div id="results"></div>
+    
+    <h2>3. Texture actuelle</h2>
+    <img id="texturePreview" style="max-width: 200px; border: 1px solid #ccc;" />
+    
+    <script>
+        async function testSettings() {
+            try {
+                const response = await fetch('/api/clubs/demo/settings');
+                const data = await response.json();
+                document.getElementById('results').innerHTML = '<h3>Settings:</h3><pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            } catch (error) {
+                document.getElementById('results').innerHTML = 'Erreur: ' + error.message;
+            }
+        }
+        
+        async function testToken3D() {
+            try {
+                const response = await fetch('/api/clubs/demo/token3d');
+                const data = await response.json();
+                document.getElementById('results').innerHTML = '<h3>Token 3D:</h3><pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                
+                if (data.tokenData && data.tokenData.texture) {
+                    document.getElementById('texturePreview').src = data.tokenData.texture;
+                }
+            } catch (error) {
+                document.getElementById('results').innerHTML = 'Erreur: ' + error.message;
+            }
+        }
+        
+        // Test automatique au chargement
+        testToken3D();
+    </script>
+</body>
+</html>

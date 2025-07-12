@@ -6,10 +6,10 @@ const prisma = new PrismaClient();
 // GET - Récupérer les données 3D du token
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const clubId = params.id;
+    const { id: clubId } = await params;
 
     const club = await prisma.club.findUnique({
       where: { id: clubId },
@@ -48,10 +48,10 @@ export async function GET(
 // PUT - Sauvegarder les données 3D du token
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const clubId = params.id;
+    const { id: clubId } = await params;
     const body = await request.json();
 
     const { texture, bandColor, animationEnabled } = body;

@@ -1,0 +1,95 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { PrismaClient } from '@/lib/generated/prisma';
+
+const prisma = new PrismaClient();
+
+// GET - Récupérer les résultats détaillés d'un sondage avec pondération par tokens
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id: pollId } = await params;
+
+    // Récupérer le sondage avec ses options et réponses
+    const poll = await prisma.poll.findUnique({
+      where: { id: pollId },
+      include: {
+        club: {
+          select: {
+            id: true,
+            name: true,
+            totalSupply: true
+          }
+        },
+        options: {
+          include: {
+            responses: {
+              select: {
+                tokenPower: true,
+                user: {
+                  select: {
+                    privyId: true
+                  }
+                }
+              }
+            }
+          },
+          orderBy: { order: 'asc' }
+        },
+        _count: {
+          select: { responses: true }
+        }
+      }
+    });
+
+    if (!poll) {
+      return NextResponse.json({ error: 'Sondage introuvable' }, { status: 404 });
+    }
+
+    // Calculer les résultats pondérés
+    const totalSupply = parseInt(poll.club.totalSupply || '1000000');
+    let totalTokensVoted = 0;
+    
+    const results = poll.options.map(option => {
+      // Sommer les tokens pour cette option
+      const tokenVotes = option.responses.reduce((sum, response) => {
+        return sum + parseInt(response.tokenPower || '0');
+      }, 0);
+      
+      totalTokensVoted += tokenVotes;
+      
+      return {
+        id: option.id,
+        text: option.text,
+        order: option.order,
+        tokenVotes, // Nombre total de tokens pour cette option
+        voterCount: option.responses.length, // Nombre de votants (personnes)
+        percentage: totalSupply > 0 ? (tokenVotes / totalSupply) * 100 : 0
+      };
+    });
+
+    // Calculer les pourcentages relatifs (par rapport aux votes exprimés)
+    const resultsWithRelativePercentage = results.map(result => ({
+      ...result,
+      relativePercentage: totalTokensVoted > 0 ? (result.tokenVotes / totalTokensVoted) * 100 : 0
+    }));
+
+    return NextResponse.json({
+      pollId: poll.id,
+      title: poll.title,
+      description: poll.description,
+      status: poll.status,
+      endDate: poll.endDate,
+      totalSupply,
+      totalTokensVoted,
+      totalVoters: poll._count.responses,
+      participationRate: totalSupply > 0 ? (totalTokensVoted / totalSupply) * 100 : 0,
+      results: resultsWithRelativePercentage
+    });
+
+  } catch (error) {
+    console.error('Erreur lors du calcul des résultats:', error);
+    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
+  }
+}

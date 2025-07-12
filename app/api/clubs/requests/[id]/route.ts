@@ -1,14 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/database';
+import { PrismaClient } from '@/lib/generated/prisma';
+
+const prisma = new PrismaClient();
 
 // GET /api/clubs/requests/[id] - Get specific club request
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id: requestId } = await params;
     const clubRequest = await prisma.clubRequest.findUnique({
-      where: { id: params.id },
+      where: { id: requestId },
       include: {
         user: {
           select: {
@@ -46,9 +49,10 @@ export async function GET(
 // PATCH /api/clubs/requests/[id] - Approve or reject club request
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id: requestId } = await params;
     const body = await request.json();
     const { action, rejectionReason } = body; // action: 'approve' | 'reject'
 
@@ -60,7 +64,7 @@ export async function PATCH(
     }
 
     const clubRequest = await prisma.clubRequest.findUnique({
-      where: { id: params.id },
+      where: { id: requestId },
       include: { user: true }
     });
 
@@ -93,7 +97,7 @@ export async function PATCH(
 
       // Update request as approved
       const updatedRequest = await prisma.clubRequest.update({
-        where: { id: params.id },
+        where: { id: requestId },
         data: {
           status: 'APPROVED',
           approvedAt: new Date(),
@@ -120,7 +124,7 @@ export async function PATCH(
     } else if (action === 'reject') {
       // Update request as rejected
       const updatedRequest = await prisma.clubRequest.update({
-        where: { id: params.id },
+        where: { id: requestId },
         data: {
           status: 'REJECTED',
           rejectionReason: rejectionReason || 'Request rejected',

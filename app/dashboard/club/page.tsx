@@ -136,7 +136,15 @@ export default function ClubDashboardPage() {
               <h1 className="text-3xl font-bold mb-2">Tableau de Bord Club</h1>
               <p className="text-[#FEFEFE]/60">Gérez votre club et vos tokens</p>
             </div>
-            <div className="text-4xl">👑</div>
+            <div className="flex items-center gap-4">
+              <button 
+                onClick={() => window.location.href = '/clubs/demo'}
+                className="bg-[#813066] hover:bg-[#813066]/80 px-4 py-2 rounded-lg font-semibold transition text-sm flex items-center gap-2"
+              >
+                👁️ Voir page publique
+              </button>
+              <div className="text-4xl">👑</div>
+            </div>
           </div>
         </div>
 
@@ -331,7 +339,10 @@ export default function ClubDashboardPage() {
             <p className="text-[#FEFEFE]/60 mb-4 text-sm">
               Créez des sondages et laissez vos fans participer aux décisions
             </p>
-            <button className="w-full bg-[#813066] hover:bg-[#813066]/80 py-2 px-4 rounded-lg font-semibold transition">
+            <button 
+              onClick={() => window.location.href = '/clubs/demo/polls'}
+              className="w-full bg-[#813066] hover:bg-[#813066]/80 py-2 px-4 rounded-lg font-semibold transition"
+            >
               Gérer Sondages
             </button>
           </div>
