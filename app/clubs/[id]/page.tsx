@@ -43,21 +43,68 @@ interface SocialLinks {
   website?: string;
 }
 
+interface PollOption {
+  id: string;
+  text: string;
+  order: number;
+  _count: {
+    responses: number;
+  };
+}
+
+interface Poll {
+  id: string;
+  title: string;
+  description: string;
+  pollType: string;
+  status: 'DRAFT' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
+  startDate: string;
+  endDate: string;
+  minTokens: string;
+  createdAt: string;
+  club: {
+    id: string;
+    name: string;
+    totalSupply: string;
+  };
+  options: PollOption[];
+  _count: {
+    responses: number;
+  };
+}
+
+interface UserVote {
+  optionId: string;
+  tokenPower: string;
+}
+
 export default function ClubDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const { authenticated } = usePrivy();
+  const { authenticated, user } = usePrivy();
   
   const [club, setClub] = useState<Club | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [socialLinks, setSocialLinks] = useState<SocialLinks>({});
+  const [polls, setPolls] = useState<Poll[]>([]);
+  const [userVotes, setUserVotes] = useState<{ [pollId: string]: UserVote }>({});
+  const [userTokens, setUserTokens] = useState(0);
+  const [pollsLoading, setPollsLoading] = useState(false);
 
   useEffect(() => {
     if (params.id) {
       loadClubData();
+      loadPolls();
     }
   }, [params.id]);
+
+  useEffect(() => {
+    if (authenticated && polls.length > 0) {
+      loadUserTokens();
+      loadUserVotes();
+    }
+  }, [authenticated, polls]);
 
   const loadClubData = async () => {
     try {
@@ -124,6 +171,134 @@ export default function ClubDetailPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const loadPolls = async () => {
+    try {
+      setPollsLoading(true);
+      const response = await fetch(`/api/polls?clubId=${params.id}&status=ACTIVE`);
+      if (response.ok) {
+        const pollsData = await response.json();
+        setPolls(pollsData);
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement des sondages:', error);
+    } finally {
+      setPollsLoading(false);
+    }
+  };
+
+  const loadUserTokens = async () => {
+    // Simuler le nombre de tokens de l'utilisateur
+    // Dans un vrai système, cela viendrait de la blockchain
+    setUserTokens(50); // Par défaut 50 tokens pour la démo
+  };
+
+  const loadUserVotes = async () => {
+    if (!authenticated || !user?.id) return;
+
+    const votes: { [pollId: string]: UserVote } = {};
+    
+    for (const poll of polls) {
+      try {
+        const response = await fetch(`/api/polls/${poll.id}/vote?userId=${user.id}`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.response) {
+            votes[poll.id] = {
+              optionId: data.response.optionId,
+              tokenPower: data.response.tokenPower
+            };
+          }
+        }
+      } catch (error) {
+        console.error(`Erreur lors du chargement du vote pour ${poll.id}:`, error);
+      }
+    }
+    
+    setUserVotes(votes);
+  };
+
+  const vote = async (pollId: string, optionId: string) => {
+    if (!authenticated || !user?.id) return;
+
+    try {
+      const response = await fetch(`/api/polls/${pollId}/vote`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          optionId,
+          tokenPower: userTokens.toString()
+        })
+      });
+
+      if (response.ok) {
+        // Mettre à jour les votes locaux
+        setUserVotes(prev => ({
+          ...prev,
+          [pollId]: { optionId, tokenPower: userTokens.toString() }
+        }));
+        
+        // Recharger les sondages pour avoir les nouveaux totaux
+        loadPolls();
+      }
+    } catch (error) {
+      console.error('Erreur lors du vote:', error);
+    }
+  };
+
+  const isExpired = (endDate: string) => {
+    return new Date(endDate) < new Date();
+  };
+
+  const canVote = (poll: Poll) => {
+    return authenticated && 
+           userTokens >= parseInt(poll.minTokens) && 
+           poll.status === 'ACTIVE' && 
+           !isExpired(poll.endDate) &&
+           !userVotes[poll.id];
+  };
+
+  const calculateResults = (poll: Poll) => {
+    const totalTokens = parseInt(poll.club.totalSupply || '0');
+    if (totalTokens === 0) return { totalVotes: 0, results: [] };
+
+    // Simuler les résultats en fonction des votes
+    const results = poll.options.map(option => {
+      // Dans un vrai système, on calculerait le total des tokenPower pour chaque option
+      const votes = Math.floor(Math.random() * (totalTokens / 4)); // Simulation
+      return {
+        ...option,
+        votes,
+        percentage: totalTokens > 0 ? (votes / totalTokens) * 100 : 0
+      };
+    });
+
+    const totalVotes = results.reduce((sum, result) => sum + result.votes, 0);
+    
+    return { totalVotes, results };
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('fr-FR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  const pollTypeLabels: { [key: string]: string } = {
+    GOVERNANCE: '🏛️ Gouvernance',
+    COACH_SELECTION: '👨‍💼 Sélection d\'entraîneur',
+    BUDGET_ALLOCATION: '💰 Allocation budgétaire',
+    STRATEGY: '🎯 Stratégie',
+    FACILITY_IMPROVEMENT: '🏟️ Amélioration des installations',
+    OTHER: '📋 Autre'
   };
 
   if (loading) {
@@ -333,6 +508,110 @@ export default function ClubDetailPage() {
             <button className="bg-[#813066] hover:bg-[#813066]/80 px-6 py-3 rounded-lg font-semibold transition">
               🔔 Me notifier du lancement
             </button>
+          </div>
+        )}
+
+        {/* Section Sondages */}
+        {polls.length > 0 && (
+          <div className="mt-8">
+            <div className="bg-[#330051]/30 border border-[#330051] rounded-2xl p-8">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold flex items-center gap-3">
+                  📊 Sondages en cours
+                </h2>
+                {authenticated && (
+                  <div className="text-sm text-[#FEFEFE]/60">
+                    Vos tokens: {userTokens}
+                  </div>
+                )}
+              </div>
+
+              {pollsLoading ? (
+                <div className="text-center py-8">
+                  <div className="w-8 h-8 border-2 border-[#FA0089] border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                  <div className="text-sm text-[#FEFEFE]/60">Chargement des sondages...</div>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {polls.map(poll => {
+                    const { results, totalVotes } = calculateResults(poll);
+                    const hasVoted = !!userVotes[poll.id];
+                    const expired = isExpired(poll.endDate);
+                    
+                    return (
+                      <div key={poll.id} className="bg-[#330051]/50 border border-[#330051] rounded-xl p-6">
+                        {/* En-tête du sondage */}
+                        <div className="mb-4">
+                          <div className="flex items-center gap-3 mb-2">
+                            <span className="text-sm bg-[#FA0089]/20 text-[#FA0089] px-2 py-1 rounded">
+                              {pollTypeLabels[poll.pollType] || poll.pollType}
+                            </span>
+                            {expired && (
+                              <span className="text-sm bg-orange-500/20 text-orange-400 px-2 py-1 rounded">
+                                ⏰ Expiré
+                              </span>
+                            )}
+                            {hasVoted && (
+                              <span className="text-sm bg-green-500/20 text-green-400 px-2 py-1 rounded">
+                                ✅ Voté ({userVotes[poll.id]?.tokenPower} tokens)
+                              </span>
+                            )}
+                          </div>
+                          <h3 className="text-xl font-bold mb-2">{poll.title}</h3>
+                          <p className="text-[#FEFEFE]/80 mb-3">{poll.description}</p>
+                          <div className="text-sm text-[#FEFEFE]/60">
+                            Fin: {formatDate(poll.endDate)} • Min: {poll.minTokens} tokens • {totalVotes} tokens votants
+                          </div>
+                        </div>
+
+                        {/* Options et résultats */}
+                        <div className="space-y-3">
+                          {results.map(option => (
+                            <div key={option.id} className="relative">
+                              {/* Barre de progression */}
+                              <div className="bg-[#330051]/50 rounded-lg overflow-hidden">
+                                <div 
+                                  className="bg-gradient-to-r from-[#FA0089]/30 to-[#FA0089]/60 h-12 transition-all duration-500 flex items-center"
+                                  style={{ width: `${Math.max(option.percentage, 2)}%` }}
+                                >
+                                  <div className="pl-4 text-sm font-medium">
+                                    {option.votes} tokens ({option.percentage.toFixed(1)}%)
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              {/* Texte de l'option */}
+                              <div className="absolute inset-0 flex items-center justify-between px-4">
+                                <span className="font-medium">{option.text}</span>
+                                
+                                {/* Bouton de vote */}
+                                {canVote(poll) && (
+                                  <button
+                                    onClick={() => vote(poll.id, option.id)}
+                                    className="bg-[#FA0089] hover:bg-[#FA0089]/80 px-4 py-1 rounded text-sm font-semibold transition ml-4"
+                                  >
+                                    Voter ({userTokens} tokens)
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Message si ne peut pas voter */}
+                        {poll.status === 'ACTIVE' && !canVote(poll) && !hasVoted && (
+                          <div className="mt-4 text-center text-[#FEFEFE]/60 text-sm">
+                            {!authenticated ? '🔒 Connectez-vous pour voter' :
+                             userTokens < parseInt(poll.minTokens) ? `❌ ${poll.minTokens} tokens minimum requis (vous avez ${userTokens})` :
+                             expired ? '⏰ Sondage expiré' : ''}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>
