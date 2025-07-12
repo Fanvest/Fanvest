@@ -79,9 +79,9 @@ export async function POST(request: NextRequest) {
         minTokens,
         clubId,
         options: {
-          create: options.map((option: string, index: number) => ({
-            text: option,
-            order: index
+          create: options.map((option: { text: string; order: number }) => ({
+            text: option.text,
+            order: option.order
           }))
         }
       },
