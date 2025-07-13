@@ -125,7 +125,7 @@ export const FanStockNavbar = () => {
                 <MenuItem setActive={setActive} active={active} item="Mon Club">
                   <div className="flex flex-col space-y-2 text-sm">
                     {userClubs.map((club) => (
-                      <HoveredLink key={club.id} href={`/dashboard/club?clubId=${club.id}`}>
+                      <HoveredLink key={club.id} href={`/clubs/${club.id}`}>
                         🏆 {club.name}
                       </HoveredLink>
                     ))}
@@ -192,7 +192,7 @@ export const FanStockNavbar = () => {
             <MenuItem setActive={setActive} active={active} item="Profil">
               <div className="flex flex-col space-y-2 text-sm">
                 <div className="text-[#FA0089] font-medium px-2 py-1">
-                  {user?.email || 'Utilisateur'}
+                  {typeof user?.email === 'string' ? user.email : 'Utilisateur'}
                 </div>
                 <div className="border-t border-[#FA0089]/30 pt-2">
                   <button

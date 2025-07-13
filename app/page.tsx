@@ -68,21 +68,12 @@ export default function Home() {
               Explore Clubs
             </button>
             
-            {authenticated && hasClub ? (
-              <button 
-                onClick={() => window.location.href = '/dashboard/club'}
-                className="bg-[#813066] hover:bg-[#813066]/80 px-8 py-4 rounded-lg font-semibold text-lg transition flex items-center gap-2"
-              >
-                👑 Mon Dashboard
-              </button>
-            ) : (
-              <button 
-                onClick={() => window.location.href = '/register-club'}
-                className="border border-[#330051] hover:border-[#FA0089] px-8 py-4 rounded-lg font-semibold text-lg transition"
-              >
-                List Your Club
-              </button>
-            )}
+            <button 
+              onClick={() => window.location.href = '/register-club'}
+              className="border border-[#330051] hover:border-[#FA0089] px-8 py-4 rounded-lg font-semibold text-lg transition"
+            >
+              List Your Club
+            </button>
           </div>
         </div>
 
@@ -186,6 +177,9 @@ export default function Home() {
           </button>
         </div>
       </section>
+      
+      {/* Flou en bas de page */}
+      <div className="fixed bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#16001D] via-[#16001D]/80 to-transparent backdrop-blur-sm pointer-events-none z-10"></div>
     </div>
   );
 }
