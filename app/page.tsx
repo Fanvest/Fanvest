@@ -60,19 +60,12 @@ export default function Home() {
             FanStock brings real ownership to 50,000+ amateur football clubs across Europe. 
             Buy tokens, vote on decisions, share revenues.
           </p>
-          <div className="flex gap-4 justify-center flex-wrap">
+          <div className="flex justify-center">
             <button 
               onClick={() => window.location.href = '/explore'}
               className="bg-[#FA0089] hover:bg-[#FA0089]/80 px-8 py-4 rounded-lg font-semibold text-lg transition"
             >
               Explore Clubs
-            </button>
-            
-            <button 
-              onClick={() => window.location.href = '/register-club'}
-              className="border border-[#330051] hover:border-[#FA0089] px-8 py-4 rounded-lg font-semibold text-lg transition"
-            >
-              List Your Club
             </button>
           </div>
         </div>
