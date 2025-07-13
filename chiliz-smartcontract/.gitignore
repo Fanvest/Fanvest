@@ -10,3 +10,5 @@ coverage/
 .vscode/
 .DS_Store
 typechain-types/
+Claude.md
+.claude/
