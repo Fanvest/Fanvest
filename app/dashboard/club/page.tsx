@@ -2,6 +2,18 @@
 
 import { useState, useEffect } from 'react';
 import { usePrivy } from '@privy-io/react-auth';
+import dynamic from 'next/dynamic';
+
+// Import dynamique du viewer 3D
+const TokenViewer3D = dynamic(() => import('@/components/TokenViewer3D'), {
+  ssr: false,
+  loading: () => (
+    <div className="text-center">
+      <div className="w-20 h-20 border-2 border-[#FA0089] border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+      <div className="text-sm text-[#FEFEFE]/60">Chargement 3D...</div>
+    </div>
+  )
+});
 
 export default function ClubDashboardPage() {
   const { user, authenticated } = usePrivy();
@@ -14,6 +26,11 @@ export default function ClubDashboardPage() {
     totalSupply: '',
     pricePerToken: '',
     address: ''
+  });
+  const [token3DData, setToken3DData] = useState({
+    texture: null as string | null,
+    bandColor: '#8B4513',
+    animationEnabled: true
   });
   
   const [formData, setFormData] = useState({
@@ -44,6 +61,8 @@ export default function ClubDashboardPage() {
           setUserClub(clubs[0]); // Prendre le premier club pour l'instant
           // Charger les données du token si elles existent
           loadTokenData(clubs[0].id);
+          // Charger les données 3D du token
+          load3DTokenData(clubs[0].id);
         }
       }
     } catch (error) {
@@ -71,6 +90,24 @@ export default function ClubDashboardPage() {
       }
     } catch (error) {
       console.error('Erreur lors du chargement du token:', error);
+    }
+  };
+
+  const load3DTokenData = async (clubId: string) => {
+    try {
+      const response = await fetch(`/api/clubs/${clubId}/token3d`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.tokenData) {
+          setToken3DData({
+            texture: data.tokenData.texture,
+            bandColor: data.tokenData.bandColor || '#8B4513',
+            animationEnabled: data.tokenData.animationEnabled ?? true
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement des données 3D:', error);
     }
   };
 
@@ -163,7 +200,21 @@ export default function ClubDashboardPage() {
     }
   };
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#16001D] to-[#330051] text-[#FEFEFE]">
+    <div className="min-h-screen bg-gradient-to-br from-[#16001D] to-[#330051] text-[#FEFEFE] relative">
+      {/* Token 3D en background - uniquement si les données 3D existent */}
+      {(token3DData.texture || token3DData.bandColor !== '#8B4513') && typeof window !== 'undefined' && (
+        <div className="fixed inset-0 z-0 opacity-15 pointer-events-none">
+          <TokenViewer3D 
+            bandColor={token3DData.bandColor}
+            animationEnabled={true}
+            texture={token3DData.texture}
+            disableControls={true}
+          />
+        </div>
+      )}
+      
+      {/* Contenu principal */}
+      <div className="relative z-10">
       {/* Navigation Header */}
       <nav className="bg-[#330051]/50 border-b border-[#330051]">
         <div className="max-w-7xl mx-auto px-6 py-4">
@@ -490,6 +541,7 @@ export default function ClubDashboardPage() {
           </div>
         </div>
 
+      </div>
       </div>
     </div>
   );
