@@ -92,19 +92,19 @@ export const HoveredLink = ({ children, ...rest }: any) => {
   );
 };
 
-// Navigation principale avec logique conditionnelle
+// Main navigation with conditional logic
 export const FanStockNavbar = () => {
   const [active, setActive] = useState<string | null>(null);
   const { authenticated, user, login, logout } = usePrivy();
   const [userClubs, setUserClubs] = useState<any[]>([]);
 
-  // Charger les clubs de l'utilisateur
+  // Load user's clubs
   React.useEffect(() => {
     if (authenticated && user?.id) {
       fetch(`/api/clubs?ownerId=${user.id}`)
         .then(res => res.json())
         .then(clubs => setUserClubs(clubs || []))
-        .catch(err => console.error('Erreur chargement clubs:', err));
+        .catch(err => console.error('Error loading clubs:', err));
     }
   }, [authenticated, user]);
 
@@ -113,20 +113,20 @@ export const FanStockNavbar = () => {
   return (
     <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50">
       <Menu setActive={setActive}>
-        {/* Logo/Accueil */}
+        {/* Logo/Home */}
         <Link href="/" className="flex items-center mr-4">
           <div className="text-xl font-bold text-accent-primary hover:text-text-primary transition-colors">
             FanStock
           </div>
         </Link>
 
-        {/* Navigation conditionnelle */}
+        {/* Conditional navigation */}
         {authenticated ? (
           <>
-            {/* Si l'utilisateur a des clubs */}
+            {/* If user has clubs */}
             {hasClubs ? (
               <>
-                <MenuItem setActive={setActive} active={active} item="Mon Club">
+                <MenuItem setActive={setActive} active={active} item="My Club">
                   <div className="flex flex-col space-y-2 text-sm min-w-[250px]">
                     {userClubs.map((club) => (
                       <div key={club.id} className="group">
@@ -136,32 +136,32 @@ export const FanStockNavbar = () => {
                         >
                           🏆 {club.name}
                         </a>
-                        {/* Sous-menu qui apparaît en dessous */}
+                        {/* Submenu that appears below */}
                         <div className="pl-4 space-y-1 max-h-0 group-hover:max-h-40 overflow-hidden transition-all duration-300 ease-in-out">
                           <a 
                             href={`/clubs/${club.id}`}
                             className="block text-gray-600 hover:text-[#fa0089] transition-colors py-1 px-2 hover:bg-pink-50 rounded text-sm"
                           >
-                            👁️ Voir la page publique
+                            👁️ View public page
                           </a>
                           <a 
                             href={`/clubs/${club.id}/polls/create`}
                             className="block text-gray-600 hover:text-[#fa0089] transition-colors py-1 px-2 hover:bg-pink-50 rounded text-sm"
                           >
-                            📊 Créer un sondage
+                            📊 Create a poll
                           </a>
                           <a 
                             href={`/clubs/${club.id}/settings`}
                             className="block text-gray-600 hover:text-[#fa0089] transition-colors py-1 px-2 hover:bg-pink-50 rounded text-sm"
                           >
-                            ⚙️ Paramètres du club
+                            ⚙️ Club settings
                           </a>
                         </div>
                       </div>
                     ))}
                     <div className="border-t border-gray-300 pt-2 mt-2">
                       <HoveredLink href="/register-club">
-                        ➕ Créer un nouveau club
+                        ➕ Create a new club
                       </HoveredLink>
                     </div>
                   </div>
@@ -170,24 +170,24 @@ export const FanStockNavbar = () => {
                 <MenuItem setActive={setActive} active={active} item="Fan">
                   <div className="flex flex-col space-y-2 text-sm">
                     <HoveredLink href="/explore">
-                      🔍 Explorer les clubs
+                      🔍 Explore clubs
                     </HoveredLink>
                     <HoveredLink href="/portfolio">
-                      💼 Mon portefeuille
+                      💼 My portfolio
                     </HoveredLink>
                     <HoveredLink href="/investments">
-                      📈 Mes investissements
+                      📈 My investments
                     </HoveredLink>
                   </div>
                 </MenuItem>
               </>
             ) : (
-              /* Si l'utilisateur n'a pas de clubs */
+              /* If user doesn't have clubs */
               <>
                 <MenuItem setActive={setActive} active={active} item="Fan">
                   <div className="flex flex-col space-y-2 text-sm">
                     <HoveredLink href="/explore">
-                      🔍 Explorer les clubs
+                      🔍 Explore clubs
                     </HoveredLink>
                   </div>
                 </MenuItem>
@@ -195,72 +195,69 @@ export const FanStockNavbar = () => {
                 <MenuItem setActive={setActive} active={active} item="Club">
                   <div className="flex flex-col space-y-2 text-sm">
                     <HoveredLink href="/register-club">
-                      🏆 Créer mon club
+                      🏆 Create my club
                     </HoveredLink>
                   </div>
                 </MenuItem>
               </>
             )}
 
-            {/* Réseau - Toujours visible pour les utilisateurs connectés */}
+            {/* Network - Always visible for logged in users */}
             <div className="flex items-center">
               <span className="text-text-primary/60 text-sm font-medium bg-accent-secondary/50 px-3 py-1 rounded-full border border-accent-secondary">
                 🌐 Chiliz Testnet
               </span>
             </div>
 
-            {/* Profil utilisateur */}
-            <MenuItem setActive={setActive} active={active} item="Profil">
+            {/* User profile */}
+            <MenuItem setActive={setActive} active={active} item="Profile">
               <div className="flex flex-col space-y-2 text-sm">
                 <div className="text-[#fa0089] font-medium px-2 py-1">
-                  {typeof user?.email === 'string' ? user.email : 'Utilisateur'}
+                  {typeof user?.email === 'string' ? user.email : 'User'}
                 </div>
                 <div className="border-t border-gray-300 pt-2">
                   <button
                     onClick={logout}
                     className="text-gray-700 hover:text-[#fa0089] transition-colors w-full text-left py-1"
                   >
-                    🚪 Se déconnecter
+                    🚪 Log out
                   </button>
                 </div>
               </div>
             </MenuItem>
           </>
         ) : (
-          /* Si l'utilisateur n'est pas connecté */
+          /* If user is not logged in */
           <>
-            <MenuItem setActive={setActive} active={active} item="Explorer">
+            <MenuItem setActive={setActive} active={active} item="Explore">
               <div className="flex flex-col space-y-2 text-sm">
                 <HoveredLink href="/explore">
-                  🔍 Découvrir les clubs
-                </HoveredLink>
-                <HoveredLink href="/how-it-works">
-                  ❓ Comment ça marche
+                  🔍 Discover clubs
                 </HoveredLink>
               </div>
             </MenuItem>
 
-            <MenuItem setActive={setActive} active={active} item="Pour les Clubs">
+            <MenuItem setActive={setActive} active={active} item="For Clubs">
               <div className="flex flex-col space-y-2 text-sm">
                 <HoveredLink href="/register-club">
-                  🏆 Créer mon club
+                  🏆 Create my club
                 </HoveredLink>
               </div>
             </MenuItem>
 
-            {/* Réseau - Visible même pour les non-connectés */}
+            {/* Network - Visible even for non-connected users */}
             <div className="flex items-center">
               <span className="text-text-primary/60 text-sm font-medium bg-accent-secondary/50 px-3 py-1 rounded-full border border-accent-secondary">
                 🌐 Chiliz Testnet
               </span>
             </div>
 
-            {/* Bouton de connexion */}
+            {/* Login button */}
             <button
               onClick={login}
               className="bg-accent-primary hover:bg-accent-primary/80 text-text-primary px-6 py-2 rounded-full font-medium transition-colors"
             >
-              Se connecter
+              Login
             </button>
           </>
         )}
