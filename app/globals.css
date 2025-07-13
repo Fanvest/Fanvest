@@ -1,0 +1,37 @@
+@import "tailwindcss";
+
+:root {
+  /* PALETTE "CHAMPION ELITE" AVEC BLEU - CONTRASTE CORRIGÉ */
+  --bg-main: #0a0a0a;        /* Noir profond - élégance premium */
+  --bg-card: #1a1a1a;        /* Gris très foncé - contraste subtil */
+  --text-main: #ffd700;      /* Or champagne - texte principal visible */
+  --text-sub: #ADD8E6;       /* Bleu clair - texte secondaire */
+  --accent-1: #ffd700;       /* Or champagne - accents importants */
+  --accent-2: #ADD8E6;       /* Bleu clair - accents secondaires */
+  --border: #404040;         /* Gris moyen - bordures discrètes (pas or!) */
+}
+
+/* CLASSES UTILITAIRES AUTOMATIQUES */
+.bg-main { background-color: var(--bg-main); }
+.bg-card { background-color: var(--bg-card); }
+.text-main { color: var(--text-main); }
+.text-sub { color: var(--text-sub); }
+.text-accent1 { color: var(--accent-1); }
+.text-accent2 { color: var(--accent-2); }
+.bg-accent1 { background-color: var(--accent-1); }
+.bg-accent2 { background-color: var(--accent-2); }
+.border-main { border-color: var(--border); }
+
+/* VARIATIONS AVEC OPACITÉ */
+.bg-main-05 { background-color: rgb(from var(--bg-main) r g b / 0.05); }
+.bg-main-10 { background-color: rgb(from var(--bg-main) r g b / 0.1); }
+.bg-accent1-05 { background-color: rgb(from var(--accent-1) r g b / 0.05); }
+.bg-accent1-10 { background-color: rgb(from var(--accent-1) r g b / 0.1); }
+.border-main-20 { border-color: rgb(from var(--border) r g b / 0.2); }
+.text-sub-60 { color: rgb(from var(--text-sub) r g b / 0.6); }
+
+.glow::after {
+  background-attachment: fixed;
+  background-origin: border-box;
+  background-size: 100% 100%;
+}

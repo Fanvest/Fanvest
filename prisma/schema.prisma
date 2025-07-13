@@ -1,0 +1,255 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./prisma/dev.db"
+}
+
+// User model - linked to Privy authentication
+model User {
+  privyId       String   @id
+  email         String?
+  walletAddress String?
+  profileImage  String?  // URL to profile picture
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  clubs         Club[]  // Clubs created by user (for UI listing)
+  votes         Vote[]
+  pollResponses PollResponse[]
+  clubRequests  ClubRequest[]
+  tokenHoldings UserToken[] // Tokens owned by user
+
+  @@map("users")
+}
+
+// Club model - amateur football clubs
+model Club {
+  id           String   @id @default(cuid())
+  name         String
+  location     String
+  description  String?
+  logo         String?  // URL to club logo
+  founded      Int?
+  
+  // Blockchain data
+  tokenAddress String?
+  tokenSymbol  String?
+  totalSupply  String?  // BigInt as string
+  pricePerToken String? // BigInt as string
+  
+  // Token 3D design data
+  tokenTexture     String?  // Base64 or URL to texture image
+  tokenBandColor   String?  // Hex color for the band
+  tokenAnimation   Boolean? @default(true) // Animation enabled
+  
+  // Social media links
+  socialLinks      String?  // JSON string with social media links
+  
+  // Metadata
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  ownerId      String
+  owner        User     @relation(fields: [ownerId], references: [privyId])
+
+  // Relations
+  polls        Poll[]
+  votes        Vote[]
+  revenues     Revenue[]
+  clubRequests ClubRequest[]
+  tokenHolders UserToken[] // Users who own tokens of this club
+
+  @@map("clubs")
+}
+
+// Polls - for club governance decisions
+model Poll {
+  id          String     @id @default(cuid())
+  title       String
+  description String
+  pollType    PollType   @default(GOVERNANCE)
+  status      PollStatus @default(ACTIVE)
+  
+  // Voting configuration
+  startDate   DateTime
+  endDate     DateTime
+  
+  // Metadata
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  clubId      String
+  club        Club       @relation(fields: [clubId], references: [id])
+
+  // Relations
+  options     PollOption[]
+  responses   PollResponse[]
+
+  @@map("polls")
+}
+
+// Poll options - choices for each poll
+model PollOption {
+  id          String   @id @default(cuid())
+  text        String
+  order       Int
+  pollId      String
+  poll        Poll     @relation(fields: [pollId], references: [id], onDelete: Cascade)
+
+  // Relations
+  responses   PollResponse[]
+
+  @@map("poll_options")
+}
+
+// Poll responses - user votes on polls
+model PollResponse {
+  id        String     @id @default(cuid())
+  tokenPower String    @default("1") // Voting power based on tokens held
+  createdAt DateTime   @default(now())
+  
+  // Relations
+  userId    String
+  user      User       @relation(fields: [userId], references: [privyId])
+  pollId    String
+  poll      Poll       @relation(fields: [pollId], references: [id])
+  optionId  String
+  option    PollOption @relation(fields: [optionId], references: [id])
+
+  @@unique([userId, pollId]) // One vote per user per poll
+  @@map("poll_responses")
+}
+
+// Votes - blockchain governance votes
+model Vote {
+  id            String    @id @default(cuid())
+  proposalId    String    // On-chain proposal ID
+  vote          VoteChoice
+  tokenPower    String    // Voting power (tokens held)
+  transactionHash String? // Blockchain transaction hash
+  
+  createdAt     DateTime  @default(now())
+  
+  // Relations
+  userId        String
+  user          User      @relation(fields: [userId], references: [privyId])
+  clubId        String
+  club          Club      @relation(fields: [clubId], references: [id])
+
+  @@unique([userId, proposalId]) // One vote per user per proposal
+  @@map("votes")
+}
+
+// Revenue tracking - club income distribution
+model Revenue {
+  id              String       @id @default(cuid())
+  amount          String       // BigInt as string
+  source          RevenueSource
+  description     String
+  transactionHash String?      // Blockchain transaction hash
+  distributed     Boolean      @default(false)
+  tokenHolderShare String?     // Amount distributed to token holders
+  
+  timestamp       DateTime     @default(now())
+  
+  // Relations
+  clubId          String
+  club            Club         @relation(fields: [clubId], references: [id])
+
+  @@map("revenues")
+}
+
+// Club registration requests - for hackathon demo
+model ClubRequest {
+  id              String            @id @default(cuid())
+  clubName        String
+  location        String
+  description     String?
+  founded         Int?
+  
+  // Contact information
+  contactEmail    String
+  phoneNumber     String?
+  website         String?
+  socialMedia     String?           // JSON string with social links
+  
+  // Documentation
+  legalDocuments  String?           // JSON array of document URLs/base64
+  
+  // Status tracking
+  status          ClubRequestStatus @default(PENDING)
+  submittedAt     DateTime          @default(now())
+  approvedAt      DateTime?
+  rejectedAt      DateTime?
+  rejectionReason String?
+  
+  // Relations
+  userId          String
+  user            User              @relation(fields: [userId], references: [privyId])
+  clubId          String?           // Set when approved
+  club            Club?             @relation(fields: [clubId], references: [id])
+
+  @@map("club_requests")
+}
+
+// User token holdings - tracks tokens owned by each user per club
+model UserToken {
+  id          String   @id @default(cuid())
+  amount      String   // Number of tokens owned (as string for big numbers)
+  purchasePrice String @default("0") // Price paid per token at purchase
+  purchasedAt DateTime @default(now())
+  
+  // Relations
+  userId      String
+  user        User     @relation(fields: [userId], references: [privyId])
+  clubId      String
+  club        Club     @relation(fields: [clubId], references: [id])
+
+  @@unique([userId, clubId]) // One record per user per club
+  @@map("user_tokens")
+}
+
+// Enums
+
+enum PollType {
+  GOVERNANCE
+  COACH_SELECTION
+  BUDGET_ALLOCATION
+  STRATEGY
+  FACILITY_IMPROVEMENT
+  OTHER
+}
+
+enum PollStatus {
+  DRAFT
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum VoteChoice {
+  FOR
+  AGAINST
+  ABSTAIN
+}
+
+enum RevenueSource {
+  TRANSFER
+  SPONSORSHIP
+  TOURNAMENT
+  PROMOTION
+  MERCHANDISE
+  OTHER
+}
+
+enum ClubRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
