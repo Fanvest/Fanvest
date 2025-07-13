@@ -122,36 +122,30 @@ export const FanStockNavbar = () => {
             {/* Si l'utilisateur a des clubs */}
             {hasClubs ? (
               <>
-                <MenuItem setActive={setActive} active={active} item="Mon Club">
-                  <div className="flex flex-col space-y-2 text-sm">
-                    {userClubs.map((club) => (
-                      <div key={club.id} className="group relative">
-                        <div className="font-medium text-[#FA0089] px-2 py-1 hover:bg-[#FA0089]/10 rounded cursor-pointer transition-colors">
-                          🏆 {club.name}
-                        </div>
-                        {/* Sous-menu au survol */}
-                        <div className="absolute left-full top-0 ml-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none group-hover:pointer-events-auto z-50">
-                          <div className="bg-[#330051]/95 backdrop-blur-sm rounded-lg border border-[#FA0089]/30 shadow-xl p-3 min-w-[200px]">
-                            <div className="space-y-1">
-                              <HoveredLink href={`/clubs/${club.id}`}>
-                                👁️ Voir la page publique
-                              </HoveredLink>
-                              <HoveredLink href={`/clubs/${club.id}/polls/create`}>
-                                📊 Créer un sondage
-                              </HoveredLink>
-                              <HoveredLink href={`/clubs/${club.id}/settings`}>
-                                ⚙️ Paramètres du club
-                              </HoveredLink>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                    <div className="border-t border-[#FA0089]/30 pt-2 mt-2">
-                      <HoveredLink href="/register-club">
-                        ➕ Créer un nouveau club
+                {userClubs.map((club) => (
+                  <MenuItem key={club.id} setActive={setActive} active={active} item={`🏆 ${club.name}`}>
+                    <div className="flex flex-col space-y-2 text-sm min-w-[200px]">
+                      <HoveredLink href={`/clubs/${club.id}`}>
+                        👁️ Voir la page publique
+                      </HoveredLink>
+                      <HoveredLink href={`/clubs/${club.id}/polls/create`}>
+                        📊 Créer un sondage
+                      </HoveredLink>
+                      <HoveredLink href={`/clubs/${club.id}/settings`}>
+                        ⚙️ Paramètres du club
                       </HoveredLink>
                     </div>
+                  </MenuItem>
+                ))}
+
+                <MenuItem setActive={setActive} active={active} item="+ Nouveau Club">
+                  <div className="flex flex-col space-y-2 text-sm">
+                    <HoveredLink href="/register-club">
+                      ➕ Créer un nouveau club
+                    </HoveredLink>
+                    <HoveredLink href="/club-benefits">
+                      ⭐ Avantages club
+                    </HoveredLink>
                   </div>
                 </MenuItem>
 
