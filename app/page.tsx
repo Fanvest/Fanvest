@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { usePrivy } from '@privy-io/react-auth';
-import { WalletManager } from '@/components/web3/WalletManager';
 import { GlowingEffect } from '@/components/glowing-effect';
 import { BGPattern } from '@/components/bg-pattern';
+import { FanStockNavbar } from '@/components/ui/navbar';
 
 export default function Home() {
   const { user, authenticated } = usePrivy();
@@ -48,13 +48,10 @@ export default function Home() {
       />
       
       {/* Navigation */}
-      <nav className="flex justify-between items-center p-6 max-w-7xl mx-auto relative z-10">
-        <div className="text-2xl font-bold">FanStock</div>
-        <WalletManager />
-      </nav>
+      <FanStockNavbar />
 
       {/* Hero Section */}
-      <section className="max-w-7xl mx-auto px-6 py-20 relative z-10">
+      <section className="max-w-7xl mx-auto px-6 pt-32 pb-20 relative z-10">
         <div className="text-center mb-16">
           <h1 className="text-5xl md:text-7xl font-bold mb-6">
             Own Your Local Club
