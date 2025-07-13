@@ -63,6 +63,13 @@ FanStock - A decentralized platform enabling grassroots and amateur sports clubs
 - Disabled 3D token manipulation for stable viewing experience
 - Forced animations on public club pages
 
+✅ **Enhanced 3D Token System**
+- Background 3D token display with subtle opacity (15%)
+- Removed redundant 3D preview sections for cleaner UI
+- Completely disabled mouse controls for background tokens
+- Full controls preserved in token creation interface
+- Owner investment restrictions with crown status indicator
+
 ## Current Tech Stack
 
 ### Frontend Framework
@@ -207,10 +214,12 @@ ClubRequests   # Registration requests (auto-approved for demo)
 ```
 
 ### 3D Token System
-- **Real-time Preview** - Live 3D rendering with user interactions
+- **Real-time Preview** - Live 3D rendering with user interactions in creator
+- **Background Display** - Subtle 3D token background on club pages (15% opacity)
 - **Texture Upload** - Custom images for token faces (PNG/JPG, max 5MB)
 - **Color Customization** - Band color selection with preset palette
 - **Animation Control** - Toggle smooth rotation animations
+- **Conditional Controls** - Full controls in creator, disabled for backgrounds
 - **Database Persistence** - All 3D settings saved to club record
 - **Responsive Design** - Works on desktop and mobile devices
 
@@ -349,8 +358,9 @@ ClubRequests   # Registration requests (auto-approved for demo)
 ### **7. Club Public Pages**
 - Complete club profile with description and logo
 - Social media integration (Facebook, Instagram, Website)
-- 3D token visualization with uploaded textures
-- Token information and investment options
+- Subtle 3D token background with no user interaction
+- Owner-restricted investment system with visual feedback
+- Dual investment options (EUR/CHZ) with conditional display
 
 ### **8. Polling System**
 - Democratic poll creation with multiple types (governance, coach selection, etc.)
