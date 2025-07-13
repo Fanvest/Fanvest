@@ -107,7 +107,7 @@ export const FanStockNavbar = () => {
   const hasClubs = userClubs.length > 0;
 
   return (
-    <div className="fixed top-4 inset-x-0 max-w-4xl mx-auto z-50">
+    <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50">
       <Menu setActive={setActive}>
         {/* Logo/Accueil */}
         <Link href="/" className="flex items-center">
