@@ -78,24 +78,24 @@ export default function CreateTokenPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#16001D] to-[#330051] text-[#FEFEFE]">
+    <div className="min-h-screen bg-gradient-to-br from-primary-bg to-accent-secondary text-text-primary">
       {/* Navigation Header */}
-      <nav className="bg-[#330051]/50 border-b border-[#330051]">
+      <nav className="bg-accent-secondary/50 border-b border-accent-secondary">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button 
                 onClick={() => window.location.href = '/'}
-                className="text-2xl font-bold hover:text-[#FA0089] transition"
+                className="text-2xl font-bold hover:text-accent-primary transition"
               >
                 FanStock
               </button>
-              <span className="text-[#FEFEFE]/40">/</span>
-              <span className="text-[#FEFEFE]/80">Créer Token</span>
+              <span className="text-text-primary/40">/</span>
+              <span className="text-text-primary/80">Créer Token</span>
             </div>
             <button 
               onClick={() => router.back()}
-              className="flex items-center gap-2 text-[#FEFEFE]/80 hover:text-[#FEFEFE] transition"
+              className="flex items-center gap-2 text-text-primary/80 hover:text-text-primary transition"
             >
               ← Retour
             </button>
@@ -104,11 +104,11 @@ export default function CreateTokenPage() {
       </nav>
 
       <div className="max-w-2xl mx-auto px-6 py-12">
-        <div className="bg-[#330051]/30 border border-[#330051] rounded-2xl p-8">
+        <div className="bg-accent-secondary/30 border border-accent-secondary rounded-2xl p-8">
           <div className="text-center mb-8">
             <div className="text-6xl mb-4">🪙</div>
             <h1 className="text-3xl font-bold mb-2">Créer le Token de votre Club</h1>
-            <p className="text-[#FEFEFE]/60">
+            <p className="text-text-primary/60">
               Définissez les paramètres de votre token. Une fois créé, ces paramètres ne pourront plus être modifiés.
             </p>
           </div>
@@ -123,12 +123,12 @@ export default function CreateTokenPage() {
                 type="text"
                 value={formData.tokenName}
                 onChange={(e) => handleInputChange('tokenName', e.target.value)}
-                className="w-full bg-[#330051]/50 border border-[#330051] rounded-lg px-4 py-3 text-[#FEFEFE] placeholder-[#FEFEFE]/40"
+                className="w-full bg-bg-main border border-main rounded-lg px-4 py-3 text-main placeholder-sub/60 focus:border-accent1 focus:outline-none"
                 placeholder="Ex: FC Montreuil Token"
                 required
                 maxLength={50}
               />
-              <p className="text-xs text-[#FEFEFE]/40 mt-1">
+              <p className="text-xs text-sub/60 mt-1">
                 Le nom complet de votre token
               </p>
             </div>
@@ -142,12 +142,12 @@ export default function CreateTokenPage() {
                 type="text"
                 value={formData.tokenSymbol}
                 onChange={(e) => handleInputChange('tokenSymbol', e.target.value)}
-                className="w-full bg-[#330051]/50 border border-[#330051] rounded-lg px-4 py-3 text-[#FEFEFE] placeholder-[#FEFEFE]/40 uppercase"
+                className="w-full bg-accent-secondary/50 border border-accent-secondary rounded-lg px-4 py-3 text-text-primary placeholder-text-primary/40 uppercase"
                 placeholder="Ex: FCMT"
                 required
                 maxLength={5}
               />
-              <p className="text-xs text-[#FEFEFE]/40 mt-1">
+              <p className="text-xs text-sub/60 mt-1">
                 3-5 lettres en majuscules
               </p>
             </div>
@@ -161,11 +161,11 @@ export default function CreateTokenPage() {
                 type="text"
                 value={formData.totalSupply}
                 onChange={(e) => handleInputChange('totalSupply', e.target.value)}
-                className="w-full bg-[#330051]/50 border border-[#330051] rounded-lg px-4 py-3 text-[#FEFEFE] placeholder-[#FEFEFE]/40"
+                className="w-full bg-bg-main border border-main rounded-lg px-4 py-3 text-main placeholder-sub/60 focus:border-accent1 focus:outline-none"
                 placeholder="Ex: 10000"
                 required
               />
-              <p className="text-xs text-[#FEFEFE]/40 mt-1">
+              <p className="text-xs text-sub/60 mt-1">
                 Minimum 1000 tokens. Recommandé : 10,000 - 100,000
               </p>
             </div>
@@ -179,39 +179,39 @@ export default function CreateTokenPage() {
                 type="text"
                 value={formData.pricePerToken}
                 onChange={(e) => handleInputChange('pricePerToken', e.target.value)}
-                className="w-full bg-[#330051]/50 border border-[#330051] rounded-lg px-4 py-3 text-[#FEFEFE] placeholder-[#FEFEFE]/40"
+                className="w-full bg-bg-main border border-main rounded-lg px-4 py-3 text-main placeholder-sub/60 focus:border-accent1 focus:outline-none"
                 placeholder="Ex: 2"
                 required
               />
-              <p className="text-xs text-[#FEFEFE]/40 mt-1">
+              <p className="text-xs text-sub/60 mt-1">
                 Prix en CHZ (nombres entiers uniquement). Recommandé : 1-5 CHZ
               </p>
             </div>
 
             {/* Résumé */}
             {(formData.totalSupply || formData.pricePerToken) && (
-              <div className="bg-[#FA0089]/10 border border-[#FA0089] rounded-lg p-4">
-                <h3 className="font-semibold mb-2 text-[#FA0089]">📊 Résumé</h3>
+              <div className="bg-accent-primary/10 border border-accent-primary rounded-lg p-4">
+                <h3 className="font-semibold mb-2 text-accent-primary">📊 Résumé</h3>
                 <div className="space-y-1 text-sm">
                   {formData.totalSupply && (
                     <div className="flex justify-between">
-                      <span className="text-[#FEFEFE]/60">Supply totale :</span>
+                      <span className="text-text-primary/60">Supply totale :</span>
                       <span>{parseInt(formData.totalSupply).toLocaleString()} tokens</span>
                     </div>
                   )}
                   {formData.pricePerToken && (
                     <div className="flex justify-between">
-                      <span className="text-[#FEFEFE]/60">Prix unitaire :</span>
+                      <span className="text-text-primary/60">Prix unitaire :</span>
                       <span>{formData.pricePerToken} CHZ</span>
                     </div>
                   )}
                   {formData.totalSupply && formData.pricePerToken && (
                     <>
                       <div className="flex justify-between">
-                        <span className="text-[#FEFEFE]/60">Prix d'une part (1%) :</span>
+                        <span className="text-text-primary/60">Prix d'une part (1%) :</span>
                         <span>{(parseInt(formData.totalSupply) / 100 * parseInt(formData.pricePerToken)).toLocaleString()} CHZ</span>
                       </div>
-                      <div className="flex justify-between font-semibold text-[#FA0089] pt-2 border-t border-[#FA0089]/20">
+                      <div className="flex justify-between font-semibold text-accent-primary pt-2 border-t border-accent-primary/20">
                         <span>Valeur totale :</span>
                         <span>{(parseInt(formData.totalSupply) * parseInt(formData.pricePerToken)).toLocaleString()} CHZ</span>
                       </div>
@@ -234,8 +234,8 @@ export default function CreateTokenPage() {
               disabled={isCreating || !formData.tokenName || !formData.tokenSymbol || !formData.totalSupply || !formData.pricePerToken}
               className={`w-full py-4 px-6 rounded-lg font-semibold text-lg transition ${
                 isCreating || !formData.tokenName || !formData.tokenSymbol || !formData.totalSupply || !formData.pricePerToken
-                  ? 'bg-[#330051]/50 cursor-not-allowed'
-                  : 'bg-[#FA0089] hover:bg-[#FA0089]/80 transform hover:scale-105'
+                  ? 'bg-accent-secondary/50 cursor-not-allowed'
+                  : 'bg-accent-primary hover:bg-accent-primary/80 transform hover:scale-105'
               }`}
             >
               {isCreating ? (
@@ -249,8 +249,8 @@ export default function CreateTokenPage() {
             </button>
 
             {/* Avertissement */}
-            <div className="bg-[#813066]/20 border border-[#813066] rounded-lg p-4">
-              <p className="text-sm text-[#FEFEFE]/80">
+            <div className="bg-accent-secondary/20 border border-accent-secondary rounded-lg p-4">
+              <p className="text-sm text-text-primary/80">
                 ⚠️ <strong>Important :</strong> Une fois le token créé, le nombre total et le prix initial ne pourront plus être modifiés. 
                 Le token sera immédiatement disponible à l'achat pour les fans.
               </p>

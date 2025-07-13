@@ -33,7 +33,7 @@ export async function GET(
       clubName: club.name,
       tokenData: {
         texture: club.tokenTexture,
-        bandColor: club.tokenBandColor || '#8B4513',
+        bandColor: club.tokenBandColor || '#ffd700',
         animationEnabled: club.tokenAnimation ?? true
       },
       hasToken: !!club.tokenAddress

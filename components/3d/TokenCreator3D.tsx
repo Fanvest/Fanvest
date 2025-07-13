@@ -28,7 +28,7 @@ const TokenCreator3D: React.FC<TokenCreator3DProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [texture, setTexture] = useState<THREE.Texture | null>(null);
   const [textureDataUrl, setTextureDataUrl] = useState<string | null>(initialData.texture || null);
-  const [bandColor, setBandColor] = useState(initialData.bandColor || '#8B4513');
+  const [bandColor, setBandColor] = useState(initialData.bandColor || 'var(--accent-primary)');
   const [animationEnabled, setAnimationEnabled] = useState(initialData.animationEnabled ?? true);
   const [isSaving, setIsSaving] = useState(false);
   
@@ -86,11 +86,11 @@ const TokenCreator3D: React.FC<TokenCreator3DProps> = ({
     }
   };
 
-  // Palette de couleurs prédéfinies
+  // Palette de couleurs prédéfinies basée sur notre design system
   const colorPalette = [
-    '#8B4513', '#CD853F', '#D2691E', '#A0522D', 
-    '#8B0000', '#006400', '#000080', '#4B0082',
-    '#FA0089', '#330051', '#813066', '#16001D'
+    'var(--accent1)', 'var(--accent2)', 'var(--main)', 'var(--card)', 
+    '#c1121f', '#669bbc', '#003049', '#f8f8ff',
+    '#780000', '#1a759f', '#16001d', '#fefefe'
   ];
 
   const handleSave = async () => {
@@ -120,18 +120,18 @@ const TokenCreator3D: React.FC<TokenCreator3DProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-gradient-to-br from-[#16001D] to-[#330051] rounded-2xl border border-[#330051] max-w-6xl w-full h-[90vh] flex overflow-hidden">
+      <div className="bg-gradient-to-br from-primary-bg to-accent-secondary rounded-2xl border border-theme-border max-w-6xl w-full h-[90vh] flex overflow-hidden">
         
         {/* Panneau de contrôle */}
-        <div className="w-80 bg-[#330051]/30 border-r border-[#330051] p-6 overflow-y-auto">
+        <div className="w-80 bg-accent-secondary/30 border-r border-theme-border p-6 overflow-y-auto">
           <div className="mb-6">
-            <h2 className="text-2xl font-bold mb-2 text-[#FEFEFE]">🎨 Créateur 3D</h2>
-            <p className="text-[#FEFEFE]/60 text-sm">Personnalisez votre jeton</p>
+            <h2 className="text-2xl font-bold mb-2 text-text-primary">🎨 Créateur 3D</h2>
+            <p className="text-text-secondary/60 text-sm">Personnalisez votre jeton</p>
           </div>
 
           {/* Upload de texture */}
           <div className="mb-6">
-            <h3 className="text-lg font-semibold mb-3 text-[#FA0089]">📎 Texture</h3>
+            <h3 className="text-lg font-semibold mb-3 text-accent-primary">📎 Texture</h3>
             <input
               ref={fileInputRef}
               type="file"
@@ -142,11 +142,11 @@ const TokenCreator3D: React.FC<TokenCreator3DProps> = ({
             />
             <label 
               htmlFor="texture-upload" 
-              className="block w-full bg-[#330051]/50 border border-[#330051] rounded-lg p-4 text-center cursor-pointer hover:bg-[#330051]/70 transition"
+              className="block w-full bg-accent-secondary/50 border border-theme-border rounded-lg p-4 text-center cursor-pointer hover:bg-accent-secondary/70 transition"
             >
               <div className="text-2xl mb-2">📁</div>
-              <div className="text-sm text-[#FEFEFE]">Choisir une image</div>
-              <div className="text-xs text-[#FEFEFE]/60 mt-1">PNG, JPG max 5MB</div>
+              <div className="text-sm text-text-primary">Choisir une image</div>
+              <div className="text-xs text-text-secondary/60 mt-1">PNG, JPG max 5MB</div>
             </label>
             
             {textureDataUrl && (
@@ -168,13 +168,13 @@ const TokenCreator3D: React.FC<TokenCreator3DProps> = ({
 
           {/* Couleur de l'anneau */}
           <div className="mb-6">
-            <h3 className="text-lg font-semibold mb-3 text-[#FA0089]">🎨 Couleur Anneau</h3>
+            <h3 className="text-lg font-semibold mb-3 text-accent-primary">🎨 Couleur Anneau</h3>
             <div className="grid grid-cols-4 gap-2 mb-3">
               {colorPalette.map(color => (
                 <div
                   key={color}
                   className={`w-12 h-12 rounded-lg cursor-pointer border-2 transition ${
-                    bandColor === color ? 'border-[#FEFEFE] scale-110' : 'border-transparent'
+                    bandColor === color ? 'border-text-primary scale-110' : 'border-transparent'
                   }`}
                   style={{ backgroundColor: color }}
                   onClick={() => setBandColor(color)}
@@ -185,21 +185,21 @@ const TokenCreator3D: React.FC<TokenCreator3DProps> = ({
               type="color"
               value={bandColor}
               onChange={(e) => setBandColor(e.target.value)}
-              className="w-full h-10 border border-[#330051] rounded-lg cursor-pointer bg-transparent"
+              className="w-full h-10 border border-theme-border rounded-lg cursor-pointer bg-transparent"
             />
           </div>
 
           {/* Animation */}
           <div className="mb-6">
-            <h3 className="text-lg font-semibold mb-3 text-[#FA0089]">⚡ Animation</h3>
+            <h3 className="text-lg font-semibold mb-3 text-accent-primary">⚡ Animation</h3>
             <label className="flex items-center gap-3 cursor-pointer">
               <input
                 type="checkbox"
                 checked={animationEnabled}
                 onChange={(e) => setAnimationEnabled(e.target.checked)}
-                className="w-5 h-5 accent-[#FA0089]"
+                className="w-5 h-5 accent-accent-primary"
               />
-              <span className="text-[#FEFEFE]">Animation activée</span>
+              <span className="text-text-primary">Animation activée</span>
             </label>
           </div>
 
@@ -210,8 +210,8 @@ const TokenCreator3D: React.FC<TokenCreator3DProps> = ({
               disabled={isSaving}
               className={`w-full py-3 px-4 rounded-lg font-semibold transition ${
                 isSaving
-                  ? 'bg-[#330051]/50 cursor-not-allowed'
-                  : 'bg-[#FA0089] hover:bg-[#FA0089]/80'
+                  ? 'bg-accent-secondary/50 cursor-not-allowed'
+                  : 'bg-accent-primary hover:bg-accent-primary/80'
               }`}
             >
               {isSaving ? (
@@ -226,7 +226,7 @@ const TokenCreator3D: React.FC<TokenCreator3DProps> = ({
             
             <button
               onClick={onClose}
-              className="w-full py-3 px-4 border border-[#330051] hover:border-[#FA0089] rounded-lg font-semibold transition"
+              className="w-full py-3 px-4 border border-theme-border hover:border-accent-primary rounded-lg font-semibold transition"
             >
               Fermer
             </button>
@@ -236,8 +236,8 @@ const TokenCreator3D: React.FC<TokenCreator3DProps> = ({
         {/* Scène 3D */}
         <div className="flex-1 relative">
           <div className="absolute top-4 left-4 z-10">
-            <h3 className="text-xl font-bold text-[#FEFEFE] mb-1">Aperçu 3D</h3>
-            <p className="text-[#FEFEFE]/60 text-sm">Utilisez la souris pour faire tourner</p>
+            <h3 className="text-xl font-bold text-text-primary mb-1">Aperçu 3D</h3>
+            <p className="text-text-secondary/60 text-sm">Utilisez la souris pour faire tourner</p>
           </div>
           
           <Canvas 
@@ -248,15 +248,15 @@ const TokenCreator3D: React.FC<TokenCreator3DProps> = ({
             {animationEnabled ? (
               <>
                 {/* Éclairage dramatique avec animation */}
-                <ambientLight intensity={0.1} color="#ffffff" />
-                <directionalLight position={[-12, 15, 8]} intensity={1.8} color="#ffffff" castShadow />
-                <pointLight position={[-8, 12, 6]} intensity={0.6} color="#ffffff" />
+                <ambientLight intensity={0.1} color="primary-surface" />
+                <directionalLight position={[-12, 15, 8]} intensity={1.8} color="primary-surface" castShadow />
+                <pointLight position={[-8, 12, 6]} intensity={0.6} color="primary-surface" />
               </>
             ) : (
               <>
                 {/* Éclairage simple et statique */}
-                <ambientLight intensity={0.4} color="#ffffff" />
-                <directionalLight position={[5, 5, 5]} intensity={1.0} color="#ffffff" />
+                <ambientLight intensity={0.4} color="primary-surface" />
+                <directionalLight position={[5, 5, 5]} intensity={1.0} color="primary-surface" />
               </>
             )}
             

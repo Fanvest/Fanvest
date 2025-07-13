@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, Suspense } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { usePrivy } from '@privy-io/react-auth';
 import dynamic from 'next/dynamic';
+import { BGPattern } from '@/components/bg-pattern';
 
 // Import dynamique du créateur 3D pour éviter les erreurs SSR
 const TokenCreator3D = dynamic(() => import('@/components/3d/TokenCreator3D'), {
@@ -35,7 +36,7 @@ export default function ClubSettingsPage() {
   const [showTokenCreator, setShowTokenCreator] = useState(false);
   const [token3DData, setToken3DData] = useState({
     texture: null as string | null,
-    bandColor: '#8B4513',
+    bandColor: '#fa0089',
     animationEnabled: true
   });
 
@@ -217,24 +218,32 @@ export default function ClubSettingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#16001D] to-[#330051] text-[#FEFEFE]">
+    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-white text-gray-900 relative">
+      <BGPattern 
+        variant="diagonal-stripes" 
+        mask="fade-edges" 
+        size={32}
+        fill="#e5e7eb"
+        className="opacity-30"
+      />
       {/* Navigation Header */}
-      <nav className="bg-[#330051]/50 border-b border-[#330051]">
+      <nav className="bg-white/90 backdrop-blur-sm border-b border-gray-200 relative z-10">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button 
                 onClick={() => window.location.href = '/'}
-                className="text-2xl font-bold hover:text-[#FA0089] transition"
+                className="text-2xl font-bold hover:opacity-80 transition"
+                style={{color: '#fa0089'}}
               >
                 FanStock
               </button>
-              <span className="text-[#FEFEFE]/40">/</span>
-              <span className="text-[#FEFEFE]/80">Paramètres Club</span>
+              <span className="text-gray-400">/</span>
+              <span className="text-gray-600">Paramètres Club</span>
             </div>
             <button 
               onClick={() => router.back()}
-              className="flex items-center gap-2 text-[#FEFEFE]/80 hover:text-[#FEFEFE] transition"
+              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition"
             >
               ← Retour
             </button>
@@ -242,29 +251,29 @@ export default function ClubSettingsPage() {
         </div>
       </nav>
 
-      <div className="max-w-4xl mx-auto px-6 py-12">
-        <div className="bg-[#330051]/30 border border-[#330051] rounded-2xl p-8">
+      <div className="max-w-4xl mx-auto px-6 py-12 relative z-10">
+        <div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-2xl p-8 shadow-lg">
           <div className="text-center mb-8">
             <div className="text-6xl mb-4">⚙️</div>
-            <h1 className="text-3xl font-bold mb-2">Paramètres du Club</h1>
-            <p className="text-[#FEFEFE]/60">
+            <h1 className="text-3xl font-bold mb-2 text-gray-900">Paramètres du Club</h1>
+            <p className="text-gray-600">
               Personnalisez l'apparence et les informations de votre club
             </p>
           </div>
 
           <form onSubmit={handleSave} className="space-y-8">
             {/* Section Logo */}
-            <div className="bg-[#330051]/20 border border-[#330051] rounded-xl p-6">
-              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl p-6 shadow-lg">
+              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-gray-900">
                 🖼️ Logo du Club
               </h2>
               
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                  <label className="block text-sm font-medium mb-2 text-gray-600">
                     Télécharger un logo
                   </label>
-                  <div className="border-2 border-dashed border-[#330051] rounded-lg p-6 text-center">
+                  <div className="border-2 border-dashed border-gray-300 hover:border-gray-400 rounded-lg p-6 text-center transition">
                     <input
                       ref={fileInputRef}
                       type="file"
@@ -275,8 +284,8 @@ export default function ClubSettingsPage() {
                     />
                     <label htmlFor="logo-upload" className="cursor-pointer">
                       <div className="text-4xl mb-2">📁</div>
-                      <p className="text-lg font-medium mb-1">Choisir un fichier</p>
-                      <p className="text-sm text-[#FEFEFE]/60">
+                      <p className="text-lg font-medium mb-1 text-gray-900">Choisir un fichier</p>
+                      <p className="text-sm text-gray-600">
                         PNG, JPG jusqu'à 5MB
                       </p>
                     </label>
@@ -284,29 +293,29 @@ export default function ClubSettingsPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                  <label className="block text-sm font-medium mb-2 text-gray-600">
                     Aperçu
                   </label>
-                  <div className="bg-[#330051]/30 border border-[#330051] rounded-lg p-6 flex items-center justify-center min-h-[150px]">
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 flex items-center justify-center min-h-[150px]">
                     {formData.logoPreview ? (
                       <div className="relative">
                         <img 
                           src={formData.logoPreview} 
                           alt="Logo preview" 
-                          className="max-w-[120px] max-h-[120px] rounded-lg"
+                          className="max-w-[120px] max-h-[120px] rounded-lg border border-gray-200"
                         />
                         <button
                           type="button"
                           onClick={removeLogo}
-                          className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
+                          className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs transition"
                         >
                           ×
                         </button>
                       </div>
                     ) : (
                       <div className="text-center">
-                        <div className="text-4xl text-[#FEFEFE]/40 mb-2">🏆</div>
-                        <p className="text-[#FEFEFE]/40">Aucun logo</p>
+                        <div className="text-4xl text-gray-400 mb-2">🏆</div>
+                        <p className="text-gray-400">Aucun logo</p>
                       </div>
                     )}
                   </div>
@@ -315,33 +324,33 @@ export default function ClubSettingsPage() {
             </div>
 
             {/* Section Informations */}
-            <div className="bg-[#330051]/20 border border-[#330051] rounded-xl p-6">
-              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl p-6 shadow-lg">
+              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-gray-900">
                 📝 Informations du Club
               </h2>
               
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                  <label className="block text-sm font-medium mb-2 text-gray-600">
                     Nom du Club
                   </label>
                   <input
                     type="text"
                     value={formData.clubName}
                     onChange={(e) => handleInputChange('clubName', e.target.value)}
-                    className="w-full bg-[#330051]/50 border border-[#330051] rounded-lg px-4 py-3 text-[#FEFEFE] placeholder-[#FEFEFE]/40"
+                    className="w-full bg-white border border-gray-300 focus:border-[#fa0089] rounded-lg px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none transition"
                     placeholder="Ex: FC Montreuil"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                  <label className="block text-sm font-medium mb-2 text-gray-600">
                     Description
                   </label>
                   <textarea
                     value={formData.description}
                     onChange={(e) => handleInputChange('description', e.target.value)}
-                    className="w-full bg-[#330051]/50 border border-[#330051] rounded-lg px-4 py-3 text-[#FEFEFE] placeholder-[#FEFEFE]/40 h-24 resize-none"
+                    className="w-full bg-white border border-gray-300 focus:border-[#fa0089] rounded-lg px-4 py-3 text-gray-900 placeholder-gray-500 h-24 resize-none focus:outline-none transition"
                     placeholder="Décrivez votre club..."
                   />
                 </div>
@@ -349,47 +358,47 @@ export default function ClubSettingsPage() {
             </div>
 
             {/* Section Réseaux Sociaux */}
-            <div className="bg-[#330051]/20 border border-[#330051] rounded-xl p-6">
-              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl p-6 shadow-lg">
+              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-gray-900">
                 🌐 Réseaux Sociaux
               </h2>
               
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2 flex items-center gap-2">
+                  <label className="block text-sm font-medium mb-2 flex items-center gap-2 text-gray-600">
                     <span className="text-blue-500">📘</span> Facebook
                   </label>
                   <input
                     type="url"
                     value={formData.socialLinks.facebook}
                     onChange={(e) => handleInputChange('social.facebook', e.target.value)}
-                    className="w-full bg-[#330051]/50 border border-[#330051] rounded-lg px-4 py-3 text-[#FEFEFE] placeholder-[#FEFEFE]/40"
+                    className="w-full bg-white border border-gray-300 focus:border-[#fa0089] rounded-lg px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none transition"
                     placeholder="https://facebook.com/votre-club"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2 flex items-center gap-2">
+                  <label className="block text-sm font-medium mb-2 flex items-center gap-2 text-gray-600">
                     <span className="text-pink-500">📷</span> Instagram
                   </label>
                   <input
                     type="url"
                     value={formData.socialLinks.instagram}
                     onChange={(e) => handleInputChange('social.instagram', e.target.value)}
-                    className="w-full bg-[#330051]/50 border border-[#330051] rounded-lg px-4 py-3 text-[#FEFEFE] placeholder-[#FEFEFE]/40"
+                    className="w-full bg-white border border-gray-300 focus:border-[#fa0089] rounded-lg px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none transition"
                     placeholder="https://instagram.com/votre-club"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2 flex items-center gap-2">
+                  <label className="block text-sm font-medium mb-2 flex items-center gap-2 text-gray-600">
                     <span className="text-gray-400">🌍</span> Site Web
                   </label>
                   <input
                     type="url"
                     value={formData.socialLinks.website}
                     onChange={(e) => handleInputChange('social.website', e.target.value)}
-                    className="w-full bg-[#330051]/50 border border-[#330051] rounded-lg px-4 py-3 text-[#FEFEFE] placeholder-[#FEFEFE]/40"
+                    className="w-full bg-white border border-gray-300 focus:border-[#fa0089] rounded-lg px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none transition"
                     placeholder="https://votre-club.com"
                   />
                 </div>
@@ -397,18 +406,19 @@ export default function ClubSettingsPage() {
             </div>
 
             {/* Section Jeton 3D */}
-            <div className="bg-[#FA0089]/10 border border-[#FA0089] rounded-xl p-6">
-              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-[#FA0089]">
+            <div className="bg-pink-50 border-2 rounded-xl p-6" style={{borderColor: '#fa0089'}}>
+              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2" style={{color: '#fa0089'}}>
                 🎨 Créateur de Jeton 3D
               </h2>
-              <p className="text-[#FEFEFE]/80 mb-4">
+              <p className="text-gray-700 mb-4">
                 Utilisez notre interface 3D pour personnaliser l'apparence de vos jetons. 
                 Créez un design unique qui représente votre club.
               </p>
               <button
                 type="button"
                 onClick={openTokenCreator3D}
-                className="bg-[#FA0089] hover:bg-[#FA0089]/80 px-6 py-3 rounded-lg font-semibold transition flex items-center gap-2"
+                className="px-6 py-3 rounded-lg font-semibold text-white flex items-center gap-2 hover:opacity-90 transition"
+                style={{backgroundColor: '#fa0089'}}
               >
                 ✨ Ouvrir le Créateur 3D
               </button>
@@ -416,14 +426,14 @@ export default function ClubSettingsPage() {
 
             {/* Messages */}
             {error && (
-              <div className="bg-red-900/20 border border-red-500 rounded-lg p-4">
-                <p className="text-red-400 text-sm">{error}</p>
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <p className="text-red-600 text-sm">{error}</p>
               </div>
             )}
 
             {successMessage && (
-              <div className="bg-green-900/20 border border-green-500 rounded-lg p-4">
-                <p className="text-green-400 text-sm">{successMessage}</p>
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <p className="text-green-600 text-sm">{successMessage}</p>
               </div>
             )}
 
@@ -434,13 +444,14 @@ export default function ClubSettingsPage() {
                 disabled={isSaving}
                 className={`flex-1 py-4 px-6 rounded-lg font-semibold text-lg transition ${
                   isSaving
-                    ? 'bg-[#330051]/50 cursor-not-allowed'
-                    : 'bg-[#FA0089] hover:bg-[#FA0089]/80 transform hover:scale-105'
+                    ? 'bg-gray-300 cursor-not-allowed text-gray-500'
+                    : 'text-white hover:opacity-90'
                 }`}
+                style={!isSaving ? {backgroundColor: '#fa0089'} : {}}
               >
                 {isSaving ? (
                   <div className="flex items-center justify-center gap-3">
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-5 h-5 border-2 border-gray-500 border-t-transparent rounded-full animate-spin"></div>
                     Sauvegarde...
                   </div>
                 ) : (
@@ -451,7 +462,7 @@ export default function ClubSettingsPage() {
               <button
                 type="button"
                 onClick={() => router.back()}
-                className="px-6 py-4 border border-[#330051] hover:border-[#FA0089] rounded-lg font-semibold transition"
+                className="px-6 py-4 border border-gray-300 hover:border-gray-400 text-gray-700 hover:text-gray-900 rounded-lg font-semibold transition"
               >
                 Annuler
               </button>

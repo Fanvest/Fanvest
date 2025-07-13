@@ -28,7 +28,7 @@ export const MenuItem = ({
     <div onMouseEnter={() => setActive(item)} className="relative">
       <motion.p
         transition={{ duration: 0.3 }}
-        className="cursor-pointer text-[#FEFEFE] hover:text-[#FA0089] font-medium"
+        className="cursor-pointer text-text-primary hover:text-accent-primary font-medium"
       >
         {item}
       </motion.p>
@@ -43,7 +43,11 @@ export const MenuItem = ({
               <motion.div
                 transition={transition}
                 layoutId="active"
-                className="bg-[#330051]/95 backdrop-blur-sm rounded-2xl overflow-hidden border border-[#FA0089]/30 shadow-xl"
+                className="bg-white/90 backdrop-blur-xl rounded-2xl overflow-hidden border border-gray-200/50 shadow-2xl"
+                style={{
+                  backdropFilter: 'blur(20px) saturate(180%)',
+                  WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+                }}
               >
                 <motion.div
                   layout
@@ -70,7 +74,7 @@ export const Menu = ({
   return (
     <nav
       onMouseLeave={() => setActive(null)}
-      className="relative rounded-full border border-[#330051] bg-[#330051]/30 backdrop-blur-sm shadow-lg flex justify-center space-x-12 px-12 py-4"
+      className="relative rounded-full border border-accent-secondary bg-accent-secondary/30 backdrop-blur-sm shadow-lg flex justify-center space-x-12 px-12 py-4"
     >
       {children}
     </nav>
@@ -81,7 +85,7 @@ export const HoveredLink = ({ children, ...rest }: any) => {
   return (
     <Link
       {...rest}
-      className="text-[#FEFEFE]/80 hover:text-[#FA0089] transition-colors duration-200 block py-1"
+      className="text-gray-700 hover:text-[#fa0089] transition-colors duration-200 block py-1"
     >
       {children}
     </Link>
@@ -111,7 +115,7 @@ export const FanStockNavbar = () => {
       <Menu setActive={setActive}>
         {/* Logo/Accueil */}
         <Link href="/" className="flex items-center">
-          <div className="text-2xl font-bold text-[#FA0089] hover:text-[#FEFEFE] transition-colors">
+          <div className="text-2xl font-bold text-accent-primary hover:text-text-primary transition-colors">
             FanStock
           </div>
         </Link>
@@ -128,7 +132,7 @@ export const FanStockNavbar = () => {
                       <div key={club.id} className="group">
                         <a 
                           href={`/dashboard/club?clubId=${club.id}`}
-                          className="block text-[#FEFEFE]/80 hover:text-[#FA0089] transition-colors py-1 px-2 hover:bg-[#FA0089]/10 rounded cursor-pointer"
+                          className="block text-gray-800 hover:text-[#fa0089] transition-colors py-1 px-2 hover:bg-pink-50 rounded cursor-pointer"
                         >
                           🏆 {club.name}
                         </a>
@@ -136,26 +140,26 @@ export const FanStockNavbar = () => {
                         <div className="pl-4 space-y-1 max-h-0 group-hover:max-h-40 overflow-hidden transition-all duration-300 ease-in-out">
                           <a 
                             href={`/clubs/${club.id}`}
-                            className="block text-[#FEFEFE]/60 hover:text-[#FA0089] transition-colors py-1 px-2 hover:bg-[#FA0089]/10 rounded text-sm"
+                            className="block text-gray-600 hover:text-[#fa0089] transition-colors py-1 px-2 hover:bg-pink-50 rounded text-sm"
                           >
                             👁️ Voir la page publique
                           </a>
                           <a 
                             href={`/clubs/${club.id}/polls/create`}
-                            className="block text-[#FEFEFE]/60 hover:text-[#FA0089] transition-colors py-1 px-2 hover:bg-[#FA0089]/10 rounded text-sm"
+                            className="block text-gray-600 hover:text-[#fa0089] transition-colors py-1 px-2 hover:bg-pink-50 rounded text-sm"
                           >
                             📊 Créer un sondage
                           </a>
                           <a 
                             href={`/clubs/${club.id}/settings`}
-                            className="block text-[#FEFEFE]/60 hover:text-[#FA0089] transition-colors py-1 px-2 hover:bg-[#FA0089]/10 rounded text-sm"
+                            className="block text-gray-600 hover:text-[#fa0089] transition-colors py-1 px-2 hover:bg-pink-50 rounded text-sm"
                           >
                             ⚙️ Paramètres du club
                           </a>
                         </div>
                       </div>
                     ))}
-                    <div className="border-t border-[#FA0089]/30 pt-2 mt-2">
+                    <div className="border-t border-gray-300 pt-2 mt-2">
                       <HoveredLink href="/register-club">
                         ➕ Créer un nouveau club
                       </HoveredLink>
@@ -209,7 +213,7 @@ export const FanStockNavbar = () => {
 
             {/* Réseau - Toujours visible pour les utilisateurs connectés */}
             <div className="flex items-center">
-              <span className="text-[#FEFEFE]/60 text-sm font-medium bg-[#330051]/50 px-3 py-1 rounded-full border border-[#330051]">
+              <span className="text-text-primary/60 text-sm font-medium bg-accent-secondary/50 px-3 py-1 rounded-full border border-accent-secondary">
                 🌐 Chiliz Testnet
               </span>
             </div>
@@ -217,13 +221,13 @@ export const FanStockNavbar = () => {
             {/* Profil utilisateur */}
             <MenuItem setActive={setActive} active={active} item="Profil">
               <div className="flex flex-col space-y-2 text-sm">
-                <div className="text-[#FA0089] font-medium px-2 py-1">
+                <div className="text-[#fa0089] font-medium px-2 py-1">
                   {typeof user?.email === 'string' ? user.email : 'Utilisateur'}
                 </div>
-                <div className="border-t border-[#FA0089]/30 pt-2">
+                <div className="border-t border-gray-300 pt-2">
                   <button
                     onClick={logout}
-                    className="text-[#FEFEFE]/80 hover:text-[#FA0089] transition-colors w-full text-left py-1"
+                    className="text-gray-700 hover:text-[#fa0089] transition-colors w-full text-left py-1"
                   >
                     🚪 Se déconnecter
                   </button>
@@ -261,7 +265,7 @@ export const FanStockNavbar = () => {
 
             {/* Réseau - Visible même pour les non-connectés */}
             <div className="flex items-center">
-              <span className="text-[#FEFEFE]/60 text-sm font-medium bg-[#330051]/50 px-3 py-1 rounded-full border border-[#330051]">
+              <span className="text-text-primary/60 text-sm font-medium bg-accent-secondary/50 px-3 py-1 rounded-full border border-accent-secondary">
                 🌐 Chiliz Testnet
               </span>
             </div>
@@ -269,7 +273,7 @@ export const FanStockNavbar = () => {
             {/* Bouton de connexion */}
             <button
               onClick={login}
-              className="bg-[#FA0089] hover:bg-[#FA0089]/80 text-[#FEFEFE] px-6 py-2 rounded-full font-medium transition-colors"
+              className="bg-accent-primary hover:bg-accent-primary/80 text-text-primary px-6 py-2 rounded-full font-medium transition-colors"
             >
               Se connecter
             </button>

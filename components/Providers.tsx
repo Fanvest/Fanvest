@@ -14,7 +14,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
         loginMethods: ['email', 'google', 'twitter', 'discord'],
         appearance: {
           theme: 'dark',
-          accentColor: '#22c55e',
+          accentColor: '#ffd700',
         },
         embeddedWallets: {
           createOnLogin: 'users-without-wallets',

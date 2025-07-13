@@ -14,7 +14,7 @@ interface Coin3DProps {
 
 const Coin3D: React.FC<Coin3DProps> = ({ 
   customTexture, 
-  bandColor = '#8B4513', 
+  bandColor = 'var(--accent-primary)', 
   bandHeight: propBandHeight = 0.55, 
   animationEnabled = true, 
   bandWidth = 0.08 
@@ -36,19 +36,19 @@ const Coin3D: React.FC<Coin3DProps> = ({
     
     if (!ctx) return new THREE.CanvasTexture(canvas);
     
-    // Créer un gradient radial doré plus réaliste
+    // Créer un gradient radial basé sur notre palette
     const gradient = ctx.createRadialGradient(256, 256, 0, 256, 256, 256);
-    gradient.addColorStop(0, '#ffd700');
-    gradient.addColorStop(0.3, '#ffed4e');
-    gradient.addColorStop(0.7, '#b8860b');
-    gradient.addColorStop(0.9, '#8b6914');
-    gradient.addColorStop(1, '#654321');
+    gradient.addColorStop(0, '#f8f8ff');
+    gradient.addColorStop(0.3, '#e1e5fe');
+    gradient.addColorStop(0.7, '#669bbc');
+    gradient.addColorStop(0.9, '#003049');
+    gradient.addColorStop(1, '#16001d');
     
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, 512, 512);
     
     // Ajouter des détails de pièce de monnaie
-    ctx.fillStyle = '#2c1810';
+    ctx.fillStyle = '#003049';
     ctx.font = 'bold 64px serif';
     ctx.textAlign = 'center';
     ctx.fillText('€', 256, 280);
@@ -58,7 +58,7 @@ const Coin3D: React.FC<Coin3DProps> = ({
     ctx.fillText('2024', 256, 350);
     
     // Cercles décoratifs concentriques
-    ctx.strokeStyle = '#2c1810';
+    ctx.strokeStyle = '#003049';
     ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.arc(256, 256, 220, 0, Math.PI * 2);

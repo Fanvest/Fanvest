@@ -13,7 +13,7 @@ interface TokenViewer3DProps {
 }
 
 const TokenViewer3D: React.FC<TokenViewer3DProps> = ({ 
-  bandColor = '#8B4513', 
+  bandColor = 'var(--accent-primary)', 
   animationEnabled = true,
   texture = null,
   disableControls = false

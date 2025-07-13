@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { usePrivy } from '@privy-io/react-auth';
+import { BGPattern } from '@/components/bg-pattern';
 
 interface PollOption {
   id: string;
@@ -214,42 +215,57 @@ export default function ClubPollsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#16001D] to-[#330051] text-[#FEFEFE] flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-gray-100 to-white text-gray-900 relative flex items-center justify-center">
+        <BGPattern 
+          variant="diagonal-stripes" 
+          mask="fade-edges" 
+          size={32}
+          fill="#e5e7eb"
+          className="opacity-30"
+        />
         <div className="text-center">
           <div className="text-6xl mb-4">📊</div>
-          <div className="text-xl font-semibold mb-2">Chargement des sondages...</div>
-          <div className="w-8 h-8 border-2 border-[#FA0089] border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <div className="text-xl font-semibold mb-2 text-gray-900">Chargement des sondages...</div>
+          <div className="w-8 h-8 border-2 rounded-full animate-spin mx-auto relative z-10" style={{borderColor: '#fa0089', borderTopColor: 'transparent'}}></div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#16001D] to-[#330051] text-[#FEFEFE]">
+    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-white text-gray-900 relative">
+      <BGPattern 
+        variant="diagonal-stripes" 
+        mask="fade-edges" 
+        size={32}
+        fill="#e5e7eb"
+        className="opacity-30"
+      />
       {/* Navigation Header */}
-      <nav className="bg-[#330051]/50 border-b border-[#330051]">
-        <div className="max-w-7xl mx-auto px-6 py-4">
+      <nav className="bg-white/90 backdrop-blur-sm border-b border-gray-200 relative z-10">
+        <div className="max-w-7xl mx-auto px-6 py-4 relative z-10">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button 
                 onClick={() => window.location.href = '/'}
-                className="text-2xl font-bold hover:text-[#FA0089] transition"
+                className="text-2xl font-bold hover:opacity-80 transition"
+                style={{color: '#fa0089'}}
               >
                 FanStock
               </button>
-              <span className="text-[#FEFEFE]/40">/</span>
+              <span className="text-gray-400">/</span>
               <button 
                 onClick={() => window.location.href = `/clubs/${params.id}`}
-                className="text-[#FEFEFE]/80 hover:text-[#FEFEFE] transition"
+                className="text-gray-600 hover:text-gray-900 transition"
               >
                 Club
               </button>
-              <span className="text-[#FEFEFE]/40">/</span>
-              <span className="text-[#FEFEFE]/80">Sondages</span>
+              <span className="text-gray-400">/</span>
+              <span className="text-gray-600">Sondages</span>
             </div>
             <button 
               onClick={() => router.back()}
-              className="flex items-center gap-2 text-[#FEFEFE]/80 hover:text-[#FEFEFE] transition"
+              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition"
             >
               ← Retour
             </button>
@@ -257,21 +273,22 @@ export default function ClubPollsPage() {
         </div>
       </nav>
 
-      <div className="max-w-6xl mx-auto px-6 py-12">
+      <div className="max-w-6xl mx-auto px-6 py-12 relative z-10">
         {/* Header */}
-        <div className="bg-[#330051]/30 border border-[#330051] rounded-2xl p-8 mb-8">
+        <div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-2xl p-8 mb-8 shadow-lg">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold mb-2 flex items-center gap-3">
+              <h1 className="text-3xl font-bold mb-2 flex items-center gap-3 text-gray-900">
                 📊 Sondages du Club
               </h1>
-              <p className="text-[#FEFEFE]/60">
-                Participez aux décisions importantes avec vos tokens ({userTokens} tokens)
+              <p className="text-gray-600">
+                Participez aux décisions importantes avec vos tokens (<span style={{color: '#fa0089', fontWeight: '600'}}>{userTokens} tokens</span>)
               </p>
             </div>
             <button 
               onClick={() => router.push(`/clubs/${params.id}/polls/create`)}
-              className="bg-[#FA0089] hover:bg-[#FA0089]/80 px-6 py-3 rounded-lg font-semibold transition flex items-center gap-2"
+              className="px-6 py-3 rounded-lg font-semibold transition flex items-center gap-2 text-white hover:opacity-90"
+              style={{backgroundColor: '#fa0089'}}
             >
               ➕ Créer un sondage
             </button>
@@ -279,14 +296,15 @@ export default function ClubPollsPage() {
         </div>
 
         {/* Onglets */}
-        <div className="flex bg-[#330051]/30 border border-[#330051] rounded-xl p-2 mb-8">
+        <div className="flex bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl p-2 mb-8 shadow-lg">
           <button
             onClick={() => setActiveTab('active')}
             className={`flex-1 py-3 px-6 rounded-lg font-semibold transition ${
               activeTab === 'active' 
-                ? 'bg-[#FA0089] text-white' 
-                : 'text-[#FEFEFE]/80 hover:text-[#FEFEFE]'
+                ? 'text-white' 
+                : 'text-gray-600 hover:text-gray-900'
             }`}
+            style={activeTab === 'active' ? {backgroundColor: '#fa0089'} : {}}
           >
             🔴 Sondages actifs ({activePolls.length})
           </button>
@@ -294,9 +312,10 @@ export default function ClubPollsPage() {
             onClick={() => setActiveTab('archived')}
             className={`flex-1 py-3 px-6 rounded-lg font-semibold transition ${
               activeTab === 'archived' 
-                ? 'bg-[#FA0089] text-white' 
-                : 'text-[#FEFEFE]/80 hover:text-[#FEFEFE]'
+                ? 'text-white' 
+                : 'text-gray-600 hover:text-gray-900'
             }`}
+            style={activeTab === 'archived' ? {backgroundColor: '#fa0089'} : {}}
           >
             📁 Archives ({archivedPolls.length})
           </button>
@@ -310,29 +329,29 @@ export default function ClubPollsPage() {
             const expired = isExpired(poll.endDate);
             
             return (
-              <div key={poll.id} className="bg-[#330051]/30 border border-[#330051] rounded-2xl p-6">
+              <div key={poll.id} className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-2xl p-6 shadow-lg">
                 {/* En-tête du sondage */}
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
-                      <span className="text-sm bg-[#FA0089]/20 text-[#FA0089] px-2 py-1 rounded">
+                      <span className="text-sm bg-pink-100 px-2 py-1 rounded font-medium" style={{color: '#fa0089'}}>
                         {pollTypeLabels[poll.pollType] || poll.pollType}
                       </span>
                       {poll.status === 'ACTIVE' && expired && (
-                        <span className="text-sm bg-orange-500/20 text-orange-400 px-2 py-1 rounded">
+                        <span className="text-sm bg-orange-100 text-orange-600 px-2 py-1 rounded font-medium">
                           ⏰ Expiré
                         </span>
                       )}
                       {hasVoted && (
-                        <span className="text-sm bg-green-500/20 text-green-400 px-2 py-1 rounded">
+                        <span className="text-sm bg-green-100 text-green-700 px-2 py-1 rounded font-medium">
                           ✅ Voté ({userVotes[poll.id]?.tokenPower} tokens)
                         </span>
                       )}
                     </div>
-                    <h3 className="text-xl font-bold mb-2">{poll.title}</h3>
-                    <p className="text-[#FEFEFE]/80 mb-3">{poll.description}</p>
-                    <div className="text-sm text-[#FEFEFE]/60">
-                      Fin: {formatDate(poll.endDate)} • {totalVotes} tokens votants
+                    <h3 className="text-xl font-bold mb-2 text-gray-900">{poll.title}</h3>
+                    <p className="text-gray-700 mb-3">{poll.description}</p>
+                    <div className="text-sm text-gray-600">
+                      Fin: {formatDate(poll.endDate)} • <span style={{color: '#fa0089', fontWeight: '600'}}>{totalVotes} tokens votants</span>
                     </div>
                   </div>
                   
@@ -340,7 +359,7 @@ export default function ClubPollsPage() {
                   {activeTab === 'active' && poll.status === 'ACTIVE' && (
                     <button
                       onClick={() => closePoll(poll.id)}
-                      className="bg-orange-500 hover:bg-orange-400 px-4 py-2 rounded-lg text-sm font-semibold transition"
+                      className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition"
                     >
                       🔒 Clôturer
                     </button>
@@ -352,12 +371,12 @@ export default function ClubPollsPage() {
                   {results.map(option => (
                     <div key={option.id} className="relative">
                       {/* Barre de progression */}
-                      <div className="bg-[#330051]/50 rounded-lg overflow-hidden">
+                      <div className="bg-gray-100 rounded-lg overflow-hidden">
                         <div 
-                          className="bg-gradient-to-r from-[#FA0089]/30 to-[#FA0089]/60 h-12 transition-all duration-500 flex items-center"
+                          className="bg-gradient-to-r from-pink-200 to-pink-400 h-12 transition-all duration-500 flex items-center"
                           style={{ width: `${Math.max(option.percentage, 2)}%` }}
                         >
-                          <div className="pl-4 text-sm font-medium">
+                          <div className="pl-4 text-sm font-medium text-white">
                             {option.votes} tokens ({option.percentage.toFixed(1)}%)
                           </div>
                         </div>
@@ -365,13 +384,14 @@ export default function ClubPollsPage() {
                       
                       {/* Texte de l'option */}
                       <div className="absolute inset-0 flex items-center justify-between px-4">
-                        <span className="font-medium">{option.text}</span>
+                        <span className="font-medium text-gray-900">{option.text}</span>
                         
                         {/* Bouton de vote */}
                         {canVote(poll) && (
                           <button
                             onClick={() => vote(poll.id, option.id)}
-                            className="bg-[#FA0089] hover:bg-[#FA0089]/80 px-4 py-1 rounded text-sm font-semibold transition ml-4"
+                            className="text-white px-4 py-1 rounded text-sm font-semibold transition ml-4 hover:opacity-90"
+                            style={{backgroundColor: '#fa0089'}}
                           >
                             Voter ({userTokens} tokens)
                           </button>
@@ -383,7 +403,7 @@ export default function ClubPollsPage() {
 
                 {/* Message si ne peut pas voter */}
                 {activeTab === 'active' && poll.status === 'ACTIVE' && !canVote(poll) && !hasVoted && (
-                  <div className="mt-4 text-center text-[#FEFEFE]/60 text-sm">
+                  <div className="mt-4 text-center text-gray-600 text-sm">
                     {!authenticated ? '🔒 Connectez-vous pour voter' :
                      expired ? '⏰ Sondage expiré' : ''}
                   </div>
@@ -399,10 +419,10 @@ export default function ClubPollsPage() {
             <div className="text-6xl mb-4">
               {activeTab === 'active' ? '📊' : '📁'}
             </div>
-            <h3 className="text-xl font-semibold mb-2">
+            <h3 className="text-xl font-semibold mb-2 text-gray-900">
               {activeTab === 'active' ? 'Aucun sondage actif' : 'Aucun sondage archivé'}
             </h3>
-            <p className="text-[#FEFEFE]/60 mb-6">
+            <p className="text-gray-600 mb-6">
               {activeTab === 'active' 
                 ? 'Créez le premier sondage pour consulter vos supporters'
                 : 'Les sondages terminés apparaîtront ici'
@@ -411,7 +431,8 @@ export default function ClubPollsPage() {
             {activeTab === 'active' && (
               <button 
                 onClick={() => router.push(`/clubs/${params.id}/polls/create`)}
-                className="bg-[#FA0089] hover:bg-[#FA0089]/80 px-6 py-3 rounded-lg font-semibold transition"
+                className="text-white px-6 py-3 rounded-lg font-semibold transition hover:opacity-90"
+                style={{backgroundColor: '#fa0089'}}
               >
                 ➕ Créer un sondage
               </button>

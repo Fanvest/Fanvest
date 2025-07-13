@@ -88,44 +88,44 @@ export default function RegisterClubPage() {
 
   if (isSuccess) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#16001D] to-[#330051] text-[#FEFEFE] flex items-center justify-center p-4">
-        <div className="bg-[#FA0089]/20 border border-[#FA0089] rounded-lg p-8 text-center max-w-lg">
-          <div className="text-[#FA0089] text-6xl mb-4">🎉</div>
-          <h2 className="text-2xl font-bold text-[#FA0089] mb-4">
+      <div className="min-h-screen bg-gradient-to-br from-bg-main to-accent2 text-main flex items-center justify-center p-4">
+        <div className="bg-card border border-main rounded-lg p-8 text-center max-w-lg">
+          <div className="text-accent1 text-6xl mb-4">🎉</div>
+          <h2 className="text-2xl font-bold text-main mb-4">
             Club Enregistré avec Succès !
           </h2>
-          <p className="text-[#FEFEFE]/80 mb-4">
+          <p className="text-sub mb-4">
             Félicitations ! Votre club "{formData.clubName}" a été créé et approuvé instantanément.
           </p>
           
           {createdClub && (
-            <div className="bg-[#330051]/30 border border-[#330051] rounded-lg p-3 mb-4 text-sm">
-              <div className="font-semibold text-[#FA0089]">Club créé :</div>
-              <div>ID: {createdClub.id}</div>
-              <div>Nom: {createdClub.name}</div>
-              <div>Localisation: {createdClub.location}</div>
-              <div>Propriétaire: {user?.email?.address}</div>
+            <div className="bg-bg-main/50 border border-main rounded-lg p-3 mb-4 text-sm">
+              <div className="font-semibold text-accent1">Club créé :</div>
+              <div className="text-sub">ID: {createdClub.id}</div>
+              <div className="text-sub">Nom: {createdClub.name}</div>
+              <div className="text-sub">Localisation: {createdClub.location}</div>
+              <div className="text-sub">Propriétaire: {user?.email?.address}</div>
             </div>
           )}
           
-          <div className="bg-[#330051]/30 border border-[#330051] rounded-lg p-4 mb-6">
-            <h3 className="text-lg font-semibold text-[#FA0089] mb-3">🔑 Vos Nouveaux Privilèges</h3>
+          <div className="bg-bg-main/50 border border-main rounded-lg p-4 mb-6">
+            <h3 className="text-lg font-semibold text-accent1 mb-3">🔑 Vos Nouveaux Privilèges</h3>
             <div className="space-y-2 text-sm text-left">
               <div className="flex items-center gap-2">
-                <span className="text-[#FA0089]">✓</span>
-                <span>Créer et gérer des tokens pour votre club</span>
+                <span className="text-accent1">✓</span>
+                <span className="text-sub">Créer et gérer des tokens pour votre club</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-[#FA0089]">✓</span>
-                <span>Lancer des sondages et votes</span>
+                <span className="text-accent1">✓</span>
+                <span className="text-sub">Lancer des sondages et votes</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-[#FA0089]">✓</span>
-                <span>Gérer les revenus et distributions</span>
+                <span className="text-accent1">✓</span>
+                <span className="text-sub">Gérer les revenus et distributions</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-[#FA0089]">✓</span>
-                <span>Accès au tableau de bord club</span>
+                <span className="text-accent1">✓</span>
+                <span className="text-sub">Accès au tableau de bord club</span>
               </div>
             </div>
           </div>
@@ -133,13 +133,13 @@ export default function RegisterClubPage() {
           <div className="flex gap-3">
             <button 
               onClick={() => window.location.href = '/dashboard/club'}
-              className="flex-1 bg-[#FA0089] hover:bg-[#FA0089]/80 px-6 py-3 rounded-lg font-semibold transition"
+              className="flex-1 bg-accent1 hover:bg-accent1/80 text-black px-6 py-3 rounded-lg font-semibold transition"
             >
               Suivant →
             </button>
             <button 
               onClick={() => window.location.href = '/'}
-              className="flex-1 bg-[#330051] hover:bg-[#330051]/80 px-6 py-3 rounded-lg font-semibold transition"
+              className="flex-1 bg-accent2 hover:bg-accent2/80 text-black px-6 py-3 rounded-lg font-semibold transition"
             >
               Accueil
             </button>
@@ -152,16 +152,16 @@ export default function RegisterClubPage() {
   // Vérification de connexion
   if (!authenticated) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#16001D] to-[#330051] text-[#FEFEFE] flex items-center justify-center p-4">
-        <div className="bg-[#330051]/30 border border-[#330051] rounded-lg p-8 text-center max-w-md">
+      <div className="min-h-screen bg-gradient-to-br from-bg-main to-accent2 text-main flex items-center justify-center p-4">
+        <div className="bg-card border border-main rounded-lg p-8 text-center max-w-md">
           <div className="text-4xl mb-4">🔐</div>
-          <h2 className="text-xl font-bold mb-4">Connexion Requise</h2>
-          <p className="text-[#FEFEFE]/80 mb-6">
+          <h2 className="text-xl font-bold mb-4 text-main">Connexion Requise</h2>
+          <p className="text-sub mb-6">
             Vous devez vous connecter avec votre wallet pour créer un club.
           </p>
           <button 
             onClick={() => window.location.href = '/'}
-            className="bg-[#813066] hover:bg-[#813066]/80 px-6 py-3 rounded-lg font-semibold transition"
+            className="bg-accent2 hover:bg-accent2/80 text-black px-6 py-3 rounded-lg font-semibold transition"
           >
             Retour à l'accueil
           </button>
@@ -171,14 +171,14 @@ export default function RegisterClubPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#16001D] to-[#330051] text-[#FEFEFE] p-4">
+    <div className="min-h-screen bg-gradient-to-br from-bg-main to-accent2 text-main p-4">
       <div className="max-w-2xl mx-auto py-8">
-        <div className="bg-[#330051]/30 border border-[#330051] rounded-lg p-8">
+        <div className="bg-card border border-main rounded-lg p-8">
           <div className="flex items-center gap-3 mb-8">
             <div className="text-3xl">⚽</div>
             <div>
               <h1 className="text-2xl font-bold">Enregistrer Votre Club</h1>
-              <p className="text-[#FEFEFE]/60">Rejoignez la révolution FanStock</p>
+              <p className="text-text-secondary/60">Rejoignez la révolution FanStock</p>
             </div>
           </div>
 
@@ -192,7 +192,7 @@ export default function RegisterClubPage() {
                 type="text"
                 value={formData.clubName}
                 onChange={(e) => handleInputChange('clubName', e.target.value)}
-                className="w-full bg-[#330051]/50 border border-[#330051] rounded-lg px-4 py-3 text-[#FEFEFE] placeholder-[#FEFEFE]/40"
+                className="w-full bg-bg-main border border-main rounded-lg px-4 py-3 text-main placeholder-sub/60 focus:border-accent1 focus:outline-none"
                 placeholder="Ex: FC Montreuil"
                 required
               />
@@ -207,7 +207,7 @@ export default function RegisterClubPage() {
                 type="text"
                 value={formData.location}
                 onChange={(e) => handleInputChange('location', e.target.value)}
-                className="w-full bg-[#330051]/50 border border-[#330051] rounded-lg px-4 py-3 text-[#FEFEFE] placeholder-[#FEFEFE]/40"
+                className="w-full bg-bg-main border border-main rounded-lg px-4 py-3 text-main placeholder-sub/60 focus:border-accent1 focus:outline-none"
                 placeholder="Ex: Montreuil, France"
                 required
               />
@@ -232,10 +232,10 @@ export default function RegisterClubPage() {
               <label className="block text-sm font-medium mb-2">
                 Email de Contact
               </label>
-              <div className="w-full bg-[#330051]/50 border border-[#330051] rounded-lg px-4 py-3 text-[#FEFEFE]/80 flex items-center gap-2">
+              <div className="w-full bg-accent-secondary/50 border border-accent-secondary rounded-lg px-4 py-3 text-text-secondary/80 flex items-center gap-2">
                 <span>📧</span>
                 <span>{user?.email?.address || 'Email non disponible'}</span>
-                <span className="text-xs text-[#FEFEFE]/40 ml-auto">Depuis votre compte Privy</span>
+                <span className="text-xs text-text-secondary/40 ml-auto">Depuis votre compte Privy</span>
               </div>
             </div>
 
@@ -244,7 +244,7 @@ export default function RegisterClubPage() {
               <label className="block text-sm font-medium mb-2">
                 Documents Justificatifs (PDF) *
               </label>
-              <div className="border-2 border-dashed border-[#330051] rounded-lg p-6 text-center">
+              <div className="border-2 border-dashed border-accent-secondary rounded-lg p-6 text-center">
                 <input
                   type="file"
                   multiple
@@ -256,10 +256,10 @@ export default function RegisterClubPage() {
                 <label htmlFor="file-upload" className="cursor-pointer">
                   <div className="text-4xl mb-2">📄</div>
                   <p className="text-lg font-medium mb-1">Déposez vos documents PDF</p>
-                  <p className="text-sm text-[#FEFEFE]/60 mb-3">
+                  <p className="text-sm text-text-secondary/60 mb-3">
                     Statuts, licence FFF, certificats, photos des installations...
                   </p>
-                  <div className="bg-[#813066] hover:bg-[#813066]/80 px-4 py-2 rounded-lg inline-block transition">
+                  <div className="bg-accent-secondary hover:bg-accent-secondary/80 px-4 py-2 rounded-lg inline-block transition">
                     Choisir les fichiers
                   </div>
                 </label>
@@ -267,14 +267,14 @@ export default function RegisterClubPage() {
               
               {formData.documents.length > 0 && (
                 <div className="mt-4 space-y-2">
-                  <p className="text-sm font-medium text-[#FA0089]">
+                  <p className="text-sm font-medium text-accent-primary">
                     {formData.documents.length} document(s) sélectionné(s) :
                   </p>
                   {formData.documents.map((file, index) => (
-                    <div key={index} className="flex items-center gap-2 text-sm bg-[#330051]/50 rounded px-3 py-2">
+                    <div key={index} className="flex items-center gap-2 text-sm bg-accent-secondary/50 rounded px-3 py-2">
                       <span>📄</span>
                       <span>{file.name}</span>
-                      <span className="text-[#FEFEFE]/60">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                      <span className="text-sub/60">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
                     </div>
                   ))}
                 </div>
@@ -295,8 +295,8 @@ export default function RegisterClubPage() {
               disabled={isSubmitting || !formData.clubName || !formData.location || !formData.description}
               className={`w-full py-4 px-6 rounded-lg font-semibold text-lg transition ${
                 isSubmitting || !formData.clubName || !formData.location || !formData.description
-                  ? 'bg-[#330051]/50 cursor-not-allowed'
-                  : 'bg-[#FA0089] hover:bg-[#FA0089]/80 transform hover:scale-105'
+                  ? 'bg-bg-main/50 cursor-not-allowed text-sub/60'
+                  : 'bg-accent1 hover:bg-accent1/80 text-black transform hover:scale-105'
               }`}
             >
               {isSubmitting ? (

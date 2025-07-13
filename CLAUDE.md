@@ -78,6 +78,16 @@ FanStock - A decentralized platform enabling grassroots and amateur sports clubs
 - Integrated Privy authentication and logout functionality
 - Supporting pages: portfolio, investments, how-it-works, club-benefits, pricing
 
+✅ **Dashboard Club - Refonte Graphique Complète (Dernière mise à jour)**
+- **Palette allégée** : Fond blanc (#FEFEFE) avec texte noir (#16001D) pour un design moderne et professionnel
+- **Actions prioritaires** : Boutons d'action principaux repositionnés en haut à droite pour un accès immédiat
+- **Layout optimisé** : Grid 12 colonnes (4-5-3) pour maximiser l'utilisation de l'espace horizontal (95vw)
+- **Header minimaliste** : Navigation épurée avec breadcrumb contextuel "Dashboard · Nom du Club"
+- **Graphiques intégrés** : Mini-visualisations dans l'aperçu (barres de progression, histogrammes)
+- **Section sondages unifiée** : Création et visualisation dans la même zone avec actions intégrées
+- **Workflow optimisé** : Moins de scroll, toutes les infos importantes visibles directement
+- **Suppression tab navigation** : Header moderne remplace l'ancienne navigation onglet
+
 ## Current Tech Stack
 
 ### Frontend Framework
@@ -306,25 +316,84 @@ ClubRequests   # Registration requests (auto-approved for demo)
 
 ### UI Design System
 
-#### **Color Palette**
+#### **Color Palette (Current Light Theme)**
 ```css
---white: #FEFEFE;
---russian-violet: #330051;
---magenta: #FA0089;
---byzantium: #813066;
---dark-purple: #16001D;
+/* Primary Colors */
+--violet-primary: #FA0089;     /* Main accent color for important elements */
+--gray-900: #111827;           /* Primary text color */
+--gray-600: #4B5563;           /* Secondary text color */
+--gray-300: #D1D5DB;           /* Border color */
+--gray-100: #F3F4F6;           /* Light backgrounds */
+--white: #FFFFFF;              /* Card backgrounds */
+
+/* Background Gradients */
+background: linear-gradient(to bottom right, #F3F4F6, #FFFFFF);
+
+/* Legacy Colors (deprecated) */
+--russian-violet: #330051;     /* ❌ No longer used */
+--byzantium: #813066;          /* ❌ No longer used */
+--dark-purple: #16001D;        /* ❌ No longer used */
 ```
 
-#### **Background Patterns**
-- **Grid Pattern** - Subtle grid overlay on main pages
-- **Gradient Backgrounds** - Dark purple to russian violet gradients
-- **Pattern Variations** - Dots, grid, diagonal stripes available
+#### **Current Design System (Light Theme)**
+- **Background**: Gray-white gradient with BGPattern diagonal-stripes
+- **Cards**: `bg-white/80 backdrop-blur-sm border border-gray-200 shadow-lg`
+- **Text**: `text-gray-900` (primary), `text-gray-600` (secondary)
+- **Accents**: Violet `#fa0089` for all important information and CTAs
+- **Inputs**: White background with violet focus states
+- **Hover**: Pink-50 (`bg-pink-50`) for hover effects
+
+#### **Background Patterns (Current)**
+```tsx
+<BGPattern 
+  variant="diagonal-stripes" 
+  mask="fade-edges" 
+  size={32}
+  fill="#e5e7eb"
+  className="opacity-30"
+/>
+```
+- **Standard Pattern**: Diagonal stripes with gray fill (#e5e7eb)
+- **Opacity**: 30% for subtle background texture
+- **Consistency**: Used across all pages (index, explore, clubs, dashboard, settings)
+- **Legacy Patterns**: Grid, dots (no longer used in current design)
 
 #### **Component Library**
 - **Navigation** - Consistent headers with breadcrumbs
 - **Cards** - Glass-morphism style with border accents
 - **Forms** - Consistent input styling with validation
-- **Buttons** - Primary (magenta), secondary (byzantium), tertiary (russian-violet)
+- **Buttons** - Multiple button types with specific use cases
+
+#### **Button Hierarchy & Usage**
+```tsx
+// ✅ ShinyButton - ONLY for main CTAs and primary conversion actions
+<ShinyButton>Explore Clubs</ShinyButton>          // Landing page main CTA
+<ShinyButton>Créer un sondage</ShinyButton>       // Dashboard primary action
+<ShinyButton>Investir en Euros</ShinyButton>      // Club investment CTA
+
+// ✅ Primary Button - Important actions (violet background)
+<button style={{backgroundColor: '#fa0089'}}>Sauvegarder</button>
+
+// ✅ Secondary Button - Regular actions (gray background)  
+<button className="bg-gray-200">Annuler</button>
+
+// ✅ Tertiary Button - Subtle actions (border only)
+<button className="border border-gray-300">Voir détails</button>
+```
+
+**ShinyButton Best Practices:**
+- ⚠️ **NEVER use ShinyButton for:**
+  - Form save buttons
+  - Settings/configuration actions  
+  - Navigation buttons
+  - Cancel/secondary actions
+  - Repetitive actions in lists
+
+- ✅ **ONLY use ShinyButton for:**
+  - Main landing page CTAs
+  - Primary conversion actions (invest, buy tokens)
+  - Key dashboard actions that drive engagement
+  - First-time user onboarding flows
 
 ## User Journey
 
