@@ -98,6 +98,9 @@ export default function ClubDetailPage() {
   const [pollsTab, setPollsTab] = useState<'active' | 'archived'>('active');
   const [showCryptoInfo, setShowCryptoInfo] = useState(false);
 
+  // Vérifier si l'utilisateur actuel est le propriétaire du club
+  const isOwner = authenticated && user?.id && club?.owner?.privyId === user.id;
+
   useEffect(() => {
     if (params.id) {
       loadClubData();
@@ -558,15 +561,27 @@ export default function ClubDetailPage() {
               
               {/* Boutons d'action */}
               <div className="space-y-3">
-                <button className="w-full bg-[#FA0089] hover:bg-[#FA0089]/80 py-3 px-6 rounded-lg font-semibold transition text-lg">
-                  💳 Investir en Euros
-                </button>
-                <button 
-                  onClick={() => setShowCryptoInfo(true)}
-                  className="w-full bg-[#330051]/70 hover:bg-[#330051] text-[#FEFEFE]/80 hover:text-[#FEFEFE] py-2 px-6 rounded-lg font-medium transition text-sm"
-                >
-                  🔗 Payer avec CHZ (crypto)
-                </button>
+                {isOwner ? (
+                  <div className="text-center p-4 bg-[#330051]/50 rounded-lg border border-[#330051]">
+                    <div className="text-2xl mb-2">👑</div>
+                    <div className="font-semibold text-[#FA0089] mb-1">Vous êtes le propriétaire</div>
+                    <div className="text-sm text-[#FEFEFE]/60">
+                      En tant que propriétaire, vous ne pouvez pas investir dans votre propre club
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <button className="w-full bg-[#FA0089] hover:bg-[#FA0089]/80 py-3 px-6 rounded-lg font-semibold transition text-lg">
+                      💳 Investir en Euros
+                    </button>
+                    <button 
+                      onClick={() => setShowCryptoInfo(true)}
+                      className="w-full bg-[#330051]/70 hover:bg-[#330051] text-[#FEFEFE]/80 hover:text-[#FEFEFE] py-2 px-6 rounded-lg font-medium transition text-sm"
+                    >
+                      🔗 Payer avec CHZ (crypto)
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           ) : (
@@ -606,9 +621,19 @@ export default function ClubDetailPage() {
                 </div>
               </div>
 
-              <button className="w-full mt-6 bg-[#FA0089] hover:bg-[#FA0089]/80 py-3 px-6 rounded-lg font-semibold transition">
-                💰 Investir dans {club.tokenSymbol}
-              </button>
+              {isOwner ? (
+                <div className="text-center p-4 bg-[#330051]/50 rounded-lg border border-[#330051] mt-6">
+                  <div className="text-xl mb-2">👑</div>
+                  <div className="font-semibold text-[#FA0089] mb-1">Propriétaire du club</div>
+                  <div className="text-sm text-[#FEFEFE]/60">
+                    Vous ne pouvez pas investir dans votre propre club
+                  </div>
+                </div>
+              ) : (
+                <button className="w-full mt-6 bg-[#FA0089] hover:bg-[#FA0089]/80 py-3 px-6 rounded-lg font-semibold transition">
+                  💰 Investir dans {club.tokenSymbol}
+                </button>
+              )}
               
               <button 
                 onClick={() => setShowCryptoInfo(false)}
