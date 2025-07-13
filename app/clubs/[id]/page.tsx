@@ -396,7 +396,7 @@ export default function ClubDetailPage() {
     <div className="min-h-screen bg-gradient-to-br from-[#16001D] to-[#330051] text-[#FEFEFE] relative">
       {/* Token 3D en background - uniquement si le club a un token */}
       {club.tokenAddress && typeof window !== 'undefined' && (
-        <div className="fixed inset-0 z-0 opacity-5 pointer-events-none">
+        <div className="fixed inset-0 z-0 opacity-15 pointer-events-none">
           <TokenViewer3D 
             bandColor={club.tokenBandColor || '#8B4513'}
             animationEnabled={true}
