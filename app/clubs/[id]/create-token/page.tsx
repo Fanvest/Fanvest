@@ -55,17 +55,32 @@ export default function CreateTokenPage() {
         throw new Error('Le prix minimum est 1 CHZ');
       }
 
-      // TODO: Appeler le smart contract pour créer le token
-      console.log('Creating token with:', {
-        clubId: params.id,
-        name: formData.tokenName,
-        symbol: formData.tokenSymbol,
-        totalSupply,
-        pricePerToken
+      // Appeler l'API pour créer le token via smart contract
+      const response = await fetch(`/api/clubs/${params.id}/token`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          tokenName: formData.tokenName,
+          tokenSymbol: formData.tokenSymbol,
+          totalSupply,
+          pricePerToken,
+          ownerId: user?.id // Use Privy user ID
+        })
       });
 
-      // Simuler un délai pour la démo
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erreur lors de la création du token');
+      }
+
+      const result = await response.json();
+      if (!result.success) {
+        throw new Error(result.message || 'Erreur lors de la création du token');
+      }
+
+      console.log('Token creation result:', result);
 
       // Rediriger vers la page du club
       router.push(`/clubs/${params.id}`);

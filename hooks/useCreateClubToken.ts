@@ -76,44 +76,39 @@ export function useCreateClubToken() {
     }
   });
 
-  // Deploy the actual smart contract
+  // Deploy the actual smart contract using our integrated system
   const deployClubToken = async (params: CreateTokenParams): Promise<TokenCreationResult> => {
     try {
-      const provider = await activeWallet!.getEthereumProvider();
-      const walletClient = createWalletClient({
-        transport: custom(provider),
-        chain: params.testnet ? chilizSpicy : chiliz
+      // Call our API route which handles smart contract deployment
+      const response = await fetch(`/api/clubs/${params.clubId}/token`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          tokenName: params.tokenName,
+          tokenSymbol: params.tokenSymbol,
+          totalSupply: parseInt(params.totalSupply),
+          pricePerToken: parseInt(params.pricePerToken),
+          ownerId: activeWallet?.address // Use wallet address as owner ID
+        })
       });
 
-      // For now, this is a placeholder for actual contract deployment
-      // In production, you would:
-      // 1. Have a factory contract deployed
-      // 2. Call factory.createClubToken() with parameters
-      // 3. Get the deployed token address from event logs
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to deploy token');
+      }
 
-      // Placeholder contract deployment
-      const totalSupplyWei = parseEther(params.totalSupply);
-      const priceWei = parseEther(params.pricePerToken);
-
-      // Example factory contract call (replace with actual contract)
-      // const factoryAddress = '0x...' // Your deployed factory address
-      // const hash = await walletClient.writeContract({
-      //   address: factoryAddress,
-      //   abi: FACTORY_ABI,
-      //   functionName: 'createClubToken',
-      //   args: [params.tokenName, params.tokenSymbol, totalSupplyWei, priceWei]
-      // });
-
-      // For demo purposes, simulate contract deployment
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate network delay
+      const result = await response.json();
       
-      const mockTokenAddress = `0x${Math.random().toString(16).substr(2, 40)}`;
-      const mockTxHash = `0x${Math.random().toString(16).substr(2, 64)}`;
+      if (!result.success) {
+        throw new Error(result.message || 'Token deployment failed');
+      }
 
       return {
         success: true,
-        tokenAddress: mockTokenAddress,
-        transactionHash: mockTxHash
+        tokenAddress: result.tokenAddress,
+        transactionHash: result.club?.transactionHash
       };
 
     } catch (error: any) {

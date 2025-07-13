@@ -6,6 +6,8 @@ import { usePrivy } from '@privy-io/react-auth';
 import dynamic from 'next/dynamic';
 import { BGPattern } from '@/components/bg-pattern';
 import { ShinyButton } from '@/components/shiny-button';
+import { BuyTokensModal } from '@/components/club/BuyTokensModal';
+import { useTokenBalance } from '@/hooks/useTokenBalance';
 
 // Import dynamique du viewer 3D
 const TokenViewer3D = dynamic(() => import('@/components/TokenViewer3D'), {
@@ -95,10 +97,12 @@ export default function ClubDetailPage() {
   const [socialLinks, setSocialLinks] = useState<SocialLinks>({});
   const [polls, setPolls] = useState<Poll[]>([]);
   const [userVotes, setUserVotes] = useState<{ [pollId: string]: UserVote }>({});
-  const [userTokens, setUserTokens] = useState(0);
+  // Utiliser le hook pour récupérer le solde réel de tokens
+  const { balance: userTokens, refetch: refetchBalance } = useTokenBalance(club?.tokenAddress);
   const [pollsLoading, setPollsLoading] = useState(false);
   const [pollsTab, setPollsTab] = useState<'active' | 'archived'>('active');
   const [showCryptoInfo, setShowCryptoInfo] = useState(false);
+  const [showBuyModal, setShowBuyModal] = useState(false);
 
   // Vérifier si l'utilisateur actuel est le propriétaire du club
   const isOwner = authenticated && user?.id && club?.owner?.privyId === user.id;
@@ -110,11 +114,7 @@ export default function ClubDetailPage() {
     }
   }, [params.id]);
 
-  useEffect(() => {
-    if (club) {
-      loadUserTokens();
-    }
-  }, [authenticated, club]);
+  // Pas besoin de loadUserTokens car le hook useTokenBalance gère ça automatiquement
 
   useEffect(() => {
     if (authenticated && polls.length > 0) {
@@ -205,24 +205,7 @@ export default function ClubDetailPage() {
     }
   };
 
-  const loadUserTokens = async () => {
-    if (!club?.tokenAddress) {
-      setUserTokens(0);
-      return;
-    }
-    
-    // Pour la démo, simuler selon le statut d'authentification
-    // Dans un vrai système, cela viendrait de la blockchain via le tokenAddress
-    if (authenticated) {
-      // Simuler différents niveaux de tokens selon l'utilisateur
-      const userId = user?.id || '';
-      const tokenCount = userId.length % 3 === 0 ? 100 : 
-                        userId.length % 3 === 1 ? 25 : 50;
-      setUserTokens(tokenCount);
-    } else {
-      setUserTokens(0);
-    }
-  };
+  // Fonction supprimée - gérée par useTokenBalance hook
 
   const loadUserVotes = async () => {
     if (!authenticated || !user?.id) return;
@@ -598,7 +581,17 @@ export default function ClubDetailPage() {
                   </div>
                 ) : (
                   <>
-                    <ShinyButton className="w-full py-3 px-6 text-lg font-semibold text-white" style={{backgroundColor: '#fa0089', '--primary': '250 0 137'}}>
+                    <ShinyButton 
+                      onClick={() => {
+                        if (!authenticated) {
+                          alert('Veuillez vous connecter pour investir');
+                          return;
+                        }
+                        setShowBuyModal(true);
+                      }}
+                      className="w-full py-3 px-6 text-lg font-semibold text-white" 
+                      style={{backgroundColor: '#fa0089', '--primary': '250 0 137'}}
+                    >
                       💳 Investir en Euros
                     </ShinyButton>
                     <button 
@@ -657,7 +650,17 @@ export default function ClubDetailPage() {
                   </div>
                 </div>
               ) : (
-                <ShinyButton className="w-full mt-6 py-3 px-6 font-semibold text-white" style={{backgroundColor: '#fa0089', '--primary': '250 0 137'}}>
+                <ShinyButton 
+                  onClick={() => {
+                    if (!authenticated) {
+                      alert('Veuillez vous connecter pour investir');
+                      return;
+                    }
+                    setShowBuyModal(true);
+                  }}
+                  className="w-full mt-6 py-3 px-6 font-semibold text-white" 
+                  style={{backgroundColor: '#fa0089', '--primary': '250 0 137'}}
+                >
                   💰 Investir dans {club.tokenSymbol}
                 </ShinyButton>
               )}
@@ -876,6 +879,19 @@ export default function ClubDetailPage() {
         )}
       </div>
       </div>
+      
+      {/* Modal d'achat de tokens */}
+      {club && club.tokenAddress && (
+        <BuyTokensModal
+          isOpen={showBuyModal}
+          onClose={() => setShowBuyModal(false)}
+          club={club}
+          onSuccess={() => {
+            refetchBalance();
+            setShowBuyModal(false);
+          }}
+        />
+      )}
     </div>
   );
 }

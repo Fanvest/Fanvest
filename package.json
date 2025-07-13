@@ -1,12 +1,19 @@
 {
-  "name": "nextjs-temp",
+  "name": "fanstock-dapp",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "hardhat:compile": "cd contracts && npx hardhat compile",
+    "hardhat:test": "cd contracts && npx hardhat test",
+    "hardhat:deploy:local": "cd contracts && npx hardhat run scripts/deploy.js --network localhost",
+    "hardhat:deploy:chiliz": "cd contracts && npx hardhat run scripts/deploy.js --network chilizSpicy",
+    "demo:on": "node scripts/toggle-demo-mode.js on",
+    "demo:off": "node scripts/toggle-demo-mode.js off",
+    "demo:toggle": "node scripts/toggle-demo-mode.js"
   },
   "dependencies": {
     "@prisma/client": "^6.11.1",
@@ -30,10 +37,13 @@
     "wagmi": "^2.15.6"
   },
   "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@openzeppelin/contracts": "^5.3.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "hardhat": "^2.25.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

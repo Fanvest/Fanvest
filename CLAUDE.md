@@ -19,12 +19,33 @@ FanStock - A decentralized platform enabling grassroots and amateur sports clubs
 - Already achieved: 3rd place in Includ3d accelerator challenge
 
 ### Current Status
-✅ **Frontend Foundation Complete**
-- Next.js 14 application with TypeScript and TailwindCSS
-- Privy integration for embedded wallets and social authentication
-- Chiliz Chain support (mainnet 88888 and testnet 88882)
-- Custom color palette (#FEFEFE, #330051, #FA0089, #813066, #16001D)
-- Responsive design with background patterns
+✅ **Smart Contract Integration Complete (95%)**
+- ClubToken.sol + FanStockFactory.sol compiled and ready for deployment
+- Complete API integration with real blockchain calls via viem
+- BuyTokensModal component with professional UI and error handling
+- useBuyTokens() and useTokenBalance() hooks for blockchain interactions
+- Mode démo/production with NEXT_PUBLIC_DEMO_MODE toggle
+- Factory deployment scripts optimized for Chiliz network
+
+✅ **Investment System Fully Functional**
+- Fixed "Investir" button functionality with proper onClick handlers
+- Professional modal interface for token purchase with CHZ pricing
+- Real-time token balance from blockchain (production) or simulated (demo)
+- Transaction links to ChiliScan explorer
+- Comprehensive error handling (insufficient funds, user rejection, etc.)
+- Owner investment restrictions with crown status indicator
+
+✅ **Bug Fixes and Database Cleanup**
+- Eliminated DEPLOYING_ fake addresses that caused viem errors
+- Proper API error handling when smart contract deployment fails
+- Database cleanup completed - no more invalid token addresses
+- Strict validation: only real contract addresses saved to database
+
+✅ **Dual Mode Architecture**
+- Demo Mode (NEXT_PUBLIC_DEMO_MODE=true): Perfect for hackathons, simulated transactions
+- Production Mode (NEXT_PUBLIC_DEMO_MODE=false): Real blockchain integration
+- Seamless switching between modes with identical user experience
+- Environment-based configuration management
 
 ✅ **Complete User Interface**
 - Landing page with grid pattern background
@@ -33,26 +54,15 @@ FanStock - A decentralized platform enabling grassroots and amateur sports clubs
 - Club dashboard with integrated token management
 - Club settings with logo upload and social media links
 - 3D token creator with real-time preview
+- Professional token purchase modal with CHZ/EUR conversion
 
 ✅ **Backend API Complete**
-- Next.js API Routes for polls, votes, uploads, and club management
+- Next.js API Routes integrated with smart contract deployment
 - SQLite database with Prisma ORM (simplified for demo)
 - File upload system with Sharp image optimization
 - Authentication middleware with Privy integration
 - Token 3D design data storage
-
-✅ **Database Migration to Privy ID**
-- User model uses Privy ID as primary key
-- Removed duplicate ID system
-- Simplified API calls to leverage Privy data
-- All tier/category system removed
-
-✅ **3D Token Customization System**
-- Real-time 3D token preview with Three.js
-- Texture upload and customization
-- Color selection for token bands
-- Animation controls
-- Database persistence of 3D designs
+- Smart contract factory integration
 
 ✅ **Comprehensive Polling System**
 - Token-weighted voting (vote power = tokens held)
@@ -68,7 +78,6 @@ FanStock - A decentralized platform enabling grassroots and amateur sports clubs
 - Removed redundant 3D preview sections for cleaner UI
 - Completely disabled mouse controls for background tokens
 - Full controls preserved in token creation interface
-- Owner investment restrictions with crown status indicator
 
 ✅ **Animated Navigation System**
 - Modern navbar with Framer Motion hover animations
@@ -101,9 +110,10 @@ FanStock - A decentralized platform enabling grassroots and amateur sports clubs
 - **Canvas API** - Texture generation and manipulation
 
 ### Web3 Integration
-- **viem** - Lightweight, type-safe Ethereum library for blockchain queries
-- **@privy-io/react-auth** - Embedded wallet creation and authentication
+- **viem** - Lightweight, type-safe Ethereum library for blockchain queries and smart contract calls
+- **@privy-io/react-auth** - Embedded wallet creation and authentication with Chiliz support
 - **@tanstack/react-query** - Async state management and blockchain data caching
+- **Custom Chiliz Integration** - Native support for Chiliz mainnet (88888) and testnet (88882)
 
 ### Backend & Database
 - **@prisma/client** - Type-safe database ORM

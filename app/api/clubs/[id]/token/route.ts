@@ -3,11 +3,9 @@ import { PrismaClient } from '@/lib/generated/prisma';
 
 const prisma = new PrismaClient();
 
-// TODO: Smart Contract Integration
+// Smart Contract Integration
 // ===============================
-// Import your smart contract deployment function here
-// import { deployTokenContract } from '@/lib/smart-contracts/token-factory';
-// import { getChilizProvider } from '@/lib/web3/provider';
+import { deployTokenContract } from '@/lib/smart-contracts/token-factory';
 
 // POST /api/clubs/[id]/token - Create new token contract
 export async function POST(
@@ -60,27 +58,53 @@ export async function POST(
       );
     }
 
-    // TODO: SMART CONTRACT DEPLOYMENT
+    // SMART CONTRACT DEPLOYMENT
     // ==============================
-    // Replace this section with actual smart contract deployment
-    // 
-    // const deploymentResult = await deployTokenContract({
-    //   name: tokenName,
-    //   symbol: tokenSymbol,
-    //   totalSupply: parseInt(totalSupply),
-    //   pricePerToken: parseInt(pricePerToken),
-    //   owner: ownerId,
-    //   clubId: clubId
-    // });
-    // 
-    // const tokenAddress = deploymentResult.contractAddress;
-    // const transactionHash = deploymentResult.transactionHash;
+    let tokenAddress: string | null = null;
+    let transactionHash: string | null = null;
+    let deploymentStatus = 'pending';
+    
+    try {
+      const deploymentResult = await deployTokenContract({
+        name: tokenName,
+        symbol: tokenSymbol,
+        clubName: club.name,
+        totalSupply: parseInt(totalSupply),
+        pricePerToken: parseInt(pricePerToken),
+        owner: ownerId,
+        clubId: clubId,
+        clubWallet: club.ownerId, // Use owner as club wallet for now
+        fanVotingPower: 40, // Default 40%
+        fanRevenueShare: 10, // Default 10%
+        testnet: true // Deploy to testnet
+      });
+      
+      tokenAddress = deploymentResult.contractAddress;
+      transactionHash = deploymentResult.transactionHash;
+      deploymentStatus = 'completed';
+      
+    } catch (deployError) {
+      console.error('Smart contract deployment failed:', deployError);
+      
+      // En mode démo ou si le déploiement échoue, ne pas sauvegarder dans la DB
+      return NextResponse.json(
+        { 
+          error: 'Smart contract deployment failed',
+          details: deployError instanceof Error ? deployError.message : 'Unknown error',
+          suggestion: 'Try enabling demo mode or ensure contracts are properly deployed'
+        },
+        { status: 500 }
+      );
+    }
 
-    // For now, create a pending deployment record
-    const tokenAddress = `DEPLOYING_${Date.now()}`;
-    const transactionHash = null;
+    // Update club with token information only if deployment succeeded
+    if (!tokenAddress) {
+      return NextResponse.json(
+        { error: 'Token deployment failed - no valid contract address' },
+        { status: 500 }
+      );
+    }
 
-    // Update club with token information (Note: tokenName n'est pas dans le schéma)
     const updatedClub = await prisma.club.update({
       where: { id: clubId },
       data: {
@@ -110,9 +134,10 @@ export async function POST(
     return NextResponse.json({
       success: true,
       club: updatedClub,
-      message: 'Token creation initiated. Smart contract deployment in progress...',
+      message: 'Token created successfully and deployed to blockchain',
       tokenAddress,
-      deploymentStatus: 'pending'
+      transactionHash,
+      deploymentStatus
     }, { status: 201 });
 
   } catch (error) {
