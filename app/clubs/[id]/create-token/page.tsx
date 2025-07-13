@@ -41,18 +41,18 @@ export default function CreateTokenPage() {
     try {
       // Validation
       if (!formData.tokenName || !formData.tokenSymbol || !formData.totalSupply || !formData.pricePerToken) {
-        throw new Error('Tous les champs sont obligatoires');
+        throw new Error('All fields are required');
       }
 
       const totalSupply = parseInt(formData.totalSupply);
       const pricePerToken = parseInt(formData.pricePerToken);
 
       if (totalSupply < 1000) {
-        throw new Error('Le nombre minimum de tokens est 1000');
+        throw new Error('Minimum number of tokens is 1000');
       }
 
       if (pricePerToken < 1) {
-        throw new Error('Le prix minimum est 1 CHZ');
+        throw new Error('Minimum price is 1 CHZ');
       }
 
       // Appeler l'API pour créer le token via smart contract
@@ -72,12 +72,12 @@ export default function CreateTokenPage() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Erreur lors de la création du token');
+        throw new Error(errorData.error || 'Error creating token');
       }
 
       const result = await response.json();
       if (!result.success) {
-        throw new Error(result.message || 'Erreur lors de la création du token');
+        throw new Error(result.message || 'Error creating token');
       }
 
       console.log('Token creation result:', result);
@@ -86,7 +86,7 @@ export default function CreateTokenPage() {
       router.push(`/clubs/${params.id}`);
       
     } catch (err: any) {
-      setError(err.message || 'Erreur lors de la création du token');
+      setError(err.message || 'Error creating token');
     } finally {
       setIsCreating(false);
     }
@@ -106,7 +106,7 @@ export default function CreateTokenPage() {
                 FanStock
               </button>
               <span className="text-text-primary/40">/</span>
-              <span className="text-text-primary/80">Créer Token</span>
+              <span className="text-text-primary/80">Create Token</span>
             </div>
             <button 
               onClick={() => router.back()}
@@ -122,9 +122,9 @@ export default function CreateTokenPage() {
         <div className="bg-accent-secondary/30 border border-accent-secondary rounded-2xl p-8">
           <div className="text-center mb-8">
             <div className="text-6xl mb-4">🪙</div>
-            <h1 className="text-3xl font-bold mb-2">Créer le Token de votre Club</h1>
+            <h1 className="text-3xl font-bold mb-2">Create Your Club Token</h1>
             <p className="text-text-primary/60">
-              Définissez les paramètres de votre token. Une fois créé, ces paramètres ne pourront plus être modifiés.
+              Define your token parameters. Once created, these parameters cannot be modified.
             </p>
           </div>
 
@@ -132,7 +132,7 @@ export default function CreateTokenPage() {
             {/* Nom du Token */}
             <div>
               <label className="block text-sm font-medium mb-2">
-                Nom du Token *
+                Token Name *
               </label>
               <input
                 type="text"
@@ -144,14 +144,14 @@ export default function CreateTokenPage() {
                 maxLength={50}
               />
               <p className="text-xs text-sub/60 mt-1">
-                Le nom complet de votre token
+                The full name of your token
               </p>
             </div>
 
             {/* Symbole du Token */}
             <div>
               <label className="block text-sm font-medium mb-2">
-                Symbole (Devise) *
+                Symbol (Currency) *
               </label>
               <input
                 type="text"
@@ -163,14 +163,14 @@ export default function CreateTokenPage() {
                 maxLength={5}
               />
               <p className="text-xs text-sub/60 mt-1">
-                3-5 lettres en majuscules
+                3-5 uppercase letters
               </p>
             </div>
 
             {/* Nombre de Tokens */}
             <div>
               <label className="block text-sm font-medium mb-2">
-                Nombre de Tokens dans la Pool *
+                Number of Tokens in Pool *
               </label>
               <input
                 type="text"
@@ -181,14 +181,14 @@ export default function CreateTokenPage() {
                 required
               />
               <p className="text-xs text-sub/60 mt-1">
-                Minimum 1000 tokens. Recommandé : 10,000 - 100,000
+                Minimum 1000 tokens. Recommended: 10,000 - 100,000
               </p>
             </div>
 
             {/* Prix par Token */}
             <div>
               <label className="block text-sm font-medium mb-2">
-                Prix par Token (CHZ) *
+                Price per Token (CHZ) *
               </label>
               <input
                 type="text"
@@ -199,35 +199,35 @@ export default function CreateTokenPage() {
                 required
               />
               <p className="text-xs text-sub/60 mt-1">
-                Prix en CHZ (nombres entiers uniquement). Recommandé : 1-5 CHZ
+                Price in CHZ (whole numbers only). Recommended: 1-5 CHZ
               </p>
             </div>
 
-            {/* Résumé */}
+            {/* Summary */}
             {(formData.totalSupply || formData.pricePerToken) && (
               <div className="bg-accent-primary/10 border border-accent-primary rounded-lg p-4">
-                <h3 className="font-semibold mb-2 text-accent-primary">📊 Résumé</h3>
+                <h3 className="font-semibold mb-2 text-accent-primary">📊 Summary</h3>
                 <div className="space-y-1 text-sm">
                   {formData.totalSupply && (
                     <div className="flex justify-between">
-                      <span className="text-text-primary/60">Supply totale :</span>
+                      <span className="text-text-primary/60">Total supply:</span>
                       <span>{parseInt(formData.totalSupply).toLocaleString()} tokens</span>
                     </div>
                   )}
                   {formData.pricePerToken && (
                     <div className="flex justify-between">
-                      <span className="text-text-primary/60">Prix unitaire :</span>
+                      <span className="text-text-primary/60">Unit price:</span>
                       <span>{formData.pricePerToken} CHZ</span>
                     </div>
                   )}
                   {formData.totalSupply && formData.pricePerToken && (
                     <>
                       <div className="flex justify-between">
-                        <span className="text-text-primary/60">Prix d'une part (1%) :</span>
+                        <span className="text-text-primary/60">Price of one share (1%):</span>
                         <span>{(parseInt(formData.totalSupply) / 100 * parseInt(formData.pricePerToken)).toLocaleString()} CHZ</span>
                       </div>
                       <div className="flex justify-between font-semibold text-accent-primary pt-2 border-t border-accent-primary/20">
-                        <span>Valeur totale :</span>
+                        <span>Total value:</span>
                         <span>{(parseInt(formData.totalSupply) * parseInt(formData.pricePerToken)).toLocaleString()} CHZ</span>
                       </div>
                     </>
@@ -256,18 +256,18 @@ export default function CreateTokenPage() {
               {isCreating ? (
                 <div className="flex items-center justify-center gap-3">
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  Création en cours...
+                  Creating...
                 </div>
               ) : (
-                '🚀 Créer le Token'
+                '🚀 Create Token'
               )}
             </button>
 
             {/* Avertissement */}
             <div className="bg-accent-secondary/20 border border-accent-secondary rounded-lg p-4">
               <p className="text-sm text-text-primary/80">
-                ⚠️ <strong>Important :</strong> Une fois le token créé, le nombre total et le prix initial ne pourront plus être modifiés. 
-                Le token sera immédiatement disponible à l'achat pour les fans.
+                ⚠️ <strong>Important:</strong> Once the token is created, the total number and initial price cannot be modified. 
+                The token will be immediately available for purchase by fans.
               </p>
             </div>
           </form>

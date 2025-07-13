@@ -25,7 +25,7 @@ export async function GET(
     });
 
     if (!club) {
-      return NextResponse.json({ error: 'Club introuvable' }, { status: 404 });
+      return NextResponse.json({ error: 'Club not found' }, { status: 404 });
     }
 
     return NextResponse.json({
@@ -71,7 +71,7 @@ export async function PUT(
     });
 
     if (!existingClub) {
-      return NextResponse.json({ error: 'Club introuvable' }, { status: 404 });
+      return NextResponse.json({ error: 'Club not found' }, { status: 404 });
     }
 
     // Sauvegarder les données 3D

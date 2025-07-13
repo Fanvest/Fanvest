@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { usePrivy } from '@privy-io/react-auth';
+import { BGPattern } from '@/components/bg-pattern';
 
 export default function RegisterClubPage() {
   const { user, authenticated } = usePrivy();
@@ -36,42 +37,35 @@ export default function RegisterClubPage() {
     setIsSubmitting(true);
     setError(null);
 
-    if (!authenticated || !user) {
-      setError("Vous devez être connecté pour créer un club");
+    if (!authenticated || !user || !user.id) {
+      setError("You must be connected to create a club. Please check your wallet connection.");
       setIsSubmitting(false);
       return;
     }
 
     try {
-      // Étape 1: Créer ou récupérer l'utilisateur
-      const userResponse = await fetch(`/api/auth/user?privyId=${user.id}`);
+      console.log('Creating club for user:', user.id);
       
-      if (!userResponse.ok) {
-        throw new Error('Erreur lors de la création du profil utilisateur');
-      }
-      
-      const userData = await userResponse.json();
-
-      // Étape 2: Créer la demande de club (avec auto-approbation)
+      // Create club request (with auto-approval) - the API will handle user creation
       const clubRequestResponse = await fetch('/api/clubs/requests', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          userId: userData.privyId,
+          userId: user.id, // Use Privy user ID directly
           clubName: formData.clubName,
           location: formData.location,
           description: formData.description,
           contactEmail: user.email?.address || '',
-          legalDocuments: formData.documents.map(file => file.name), // Simulation des fichiers
-          autoApprove: true // Auto-approval pour hackathon
+          legalDocuments: formData.documents.map(file => file.name), // File simulation
+          autoApprove: true // Auto-approval for hackathon
         })
       });
 
       if (!clubRequestResponse.ok) {
         const errorData = await clubRequestResponse.json();
-        throw new Error(errorData.error || 'Erreur lors de la création du club');
+        throw new Error(errorData.error || 'Error creating club');
       }
 
       const result = await clubRequestResponse.json();
@@ -79,8 +73,8 @@ export default function RegisterClubPage() {
       setIsSuccess(true);
       
     } catch (err: any) {
-      console.error('Erreur lors de la création du club:', err);
-      setError(err.message || 'Une erreur est survenue');
+      console.error('Error creating club:', err);
+      setError(err.message || 'An error occurred');
     } finally {
       setIsSubmitting(false);
     }
@@ -88,44 +82,51 @@ export default function RegisterClubPage() {
 
   if (isSuccess) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-bg-main to-accent2 text-main flex items-center justify-center p-4">
-        <div className="bg-card border border-main rounded-lg p-8 text-center max-w-lg">
-          <div className="text-accent1 text-6xl mb-4">🎉</div>
-          <h2 className="text-2xl font-bold text-main mb-4">
-            Club Enregistré avec Succès !
+      <div className="min-h-screen bg-gradient-to-br from-gray-100 to-white text-gray-900 flex items-center justify-center p-4 relative">
+        <BGPattern 
+          variant="diagonal-stripes" 
+          mask="fade-edges" 
+          size={32}
+          fill="#e5e7eb"
+          className="opacity-30"
+        />
+        <div className="bg-white/90 backdrop-blur-sm border border-gray-200 rounded-2xl p-8 text-center max-w-lg shadow-lg relative z-10">
+          <div className="text-6xl mb-4">🎉</div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            Club Registered Successfully!
           </h2>
-          <p className="text-sub mb-4">
-            Félicitations ! Votre club "{formData.clubName}" a été créé et approuvé instantanément.
+          <p className="text-gray-600 mb-4">
+            Congratulations! Your club "{formData.clubName}" has been created and instantly approved.
           </p>
           
           {createdClub && (
-            <div className="bg-bg-main/50 border border-main rounded-lg p-3 mb-4 text-sm">
-              <div className="font-semibold text-accent1">Club créé :</div>
-              <div className="text-sub">ID: {createdClub.id}</div>
-              <div className="text-sub">Nom: {createdClub.name}</div>
-              <div className="text-sub">Localisation: {createdClub.location}</div>
-              <div className="text-sub">Propriétaire: {user?.email?.address}</div>
+            <div className="bg-gray-100 border border-gray-200 rounded-lg p-3 mb-4 text-sm">
+              <div className="font-semibold" style={{color: '#fa0089'}}>Created club:</div>
+              <div className="text-gray-600">ID: {createdClub.id}</div>
+              <div className="text-gray-600">Name: {createdClub.name}</div>
+              <div className="text-gray-600">Location: {createdClub.location}</div>
+              <div className="text-gray-600">Owner: {user?.email?.address}</div>
             </div>
           )}
           
-          <div className="bg-bg-main/50 border border-main rounded-lg p-4 mb-6">
-            <h3 className="text-lg font-semibold text-accent1 mb-3">🔑 Vos Nouveaux Privilèges</h3>
+          <div className="bg-gray-100 border border-gray-200 rounded-lg p-4 mb-6">
+            <h3 className="text-lg font-semibold mb-3" style={{color: '#fa0089'}}>🔑 Your New Privileges</h3>
             <div className="space-y-2 text-sm text-left">
               <div className="flex items-center gap-2">
-                <span className="text-accent1">✓</span>
-                <span className="text-sub">Créer et gérer des tokens pour votre club</span>
+                <span style={{color: '#fa0089'}}>✓</span>
+                <span className="text-gray-600">Create and manage tokens for your club</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-accent1">✓</span>
-                <span className="text-sub">Lancer des sondages et votes</span>
+                <span style={{color: '#fa0089'}}>✓</span>
+                <span className="text-gray-600">Launch polls and votes</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-accent1">✓</span>
-                <span className="text-sub">Gérer les revenus et distributions</span>
+                <span style={{color: '#fa0089'}}>✓</span>
+                <span className="text-gray-600">Manage revenues and distributions</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-accent1">✓</span>
-                <span className="text-sub">Accès au tableau de bord club</span>
+                <span style={{color: '#fa0089'}}>✓</span>
+                <span className="text-gray-600">Access the club dashboard</span>
               </div>
             </div>
           </div>
@@ -133,15 +134,16 @@ export default function RegisterClubPage() {
           <div className="flex gap-3">
             <button 
               onClick={() => window.location.href = '/dashboard/club'}
-              className="flex-1 bg-accent1 hover:bg-accent1/80 text-black px-6 py-3 rounded-lg font-semibold transition"
+              className="flex-1 text-white px-6 py-3 rounded-lg font-semibold transition hover:opacity-90"
+              style={{backgroundColor: '#fa0089'}}
             >
-              Suivant →
+              Next →
             </button>
             <button 
               onClick={() => window.location.href = '/'}
-              className="flex-1 bg-accent2 hover:bg-accent2/80 text-black px-6 py-3 rounded-lg font-semibold transition"
+              className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-semibold transition"
             >
-              Accueil
+              Home
             </button>
           </div>
         </div>
@@ -149,21 +151,28 @@ export default function RegisterClubPage() {
     );
   }
 
-  // Vérification de connexion
+  // Connection check
   if (!authenticated) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-bg-main to-accent2 text-main flex items-center justify-center p-4">
-        <div className="bg-card border border-main rounded-lg p-8 text-center max-w-md">
+      <div className="min-h-screen bg-gradient-to-br from-gray-100 to-white text-gray-900 flex items-center justify-center p-4 relative">
+        <BGPattern 
+          variant="diagonal-stripes" 
+          mask="fade-edges" 
+          size={32}
+          fill="#e5e7eb"
+          className="opacity-30"
+        />
+        <div className="bg-white/90 backdrop-blur-sm border border-gray-200 rounded-2xl p-8 text-center max-w-md shadow-lg relative z-10">
           <div className="text-4xl mb-4">🔐</div>
-          <h2 className="text-xl font-bold mb-4 text-main">Connexion Requise</h2>
-          <p className="text-sub mb-6">
-            Vous devez vous connecter avec votre wallet pour créer un club.
+          <h2 className="text-xl font-bold mb-4 text-gray-900">Login Required</h2>
+          <p className="text-gray-600 mb-6">
+            You must log in with your wallet to create a club.
           </p>
           <button 
             onClick={() => window.location.href = '/'}
-            className="bg-accent2 hover:bg-accent2/80 text-black px-6 py-3 rounded-lg font-semibold transition"
+            className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-semibold transition"
           >
-            Retour à l'accueil
+            Back to home
           </button>
         </div>
       </div>
@@ -171,80 +180,87 @@ export default function RegisterClubPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-bg-main to-accent2 text-main p-4">
-      <div className="max-w-2xl mx-auto py-8">
-        <div className="bg-card border border-main rounded-lg p-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-white text-gray-900 p-4 relative">
+      <BGPattern 
+        variant="diagonal-stripes" 
+        mask="fade-edges" 
+        size={32}
+        fill="#e5e7eb"
+        className="opacity-30"
+      />
+      <div className="max-w-2xl mx-auto py-8 relative z-10">
+        <div className="bg-white/90 backdrop-blur-sm border border-gray-200 rounded-2xl p-8 shadow-lg">
           <div className="flex items-center gap-3 mb-8">
             <div className="text-3xl">⚽</div>
             <div>
-              <h1 className="text-2xl font-bold">Enregistrer Votre Club</h1>
-              <p className="text-text-secondary/60">Rejoignez la révolution FanStock</p>
+              <h1 className="text-2xl font-bold">Register Your Club</h1>
+              <p className="text-gray-600">Join the FanStock revolution</p>
             </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Nom du club */}
+            {/* Club name */}
             <div>
               <label className="block text-sm font-medium mb-2">
-                Nom du Club *
+                Club Name *
               </label>
               <input
                 type="text"
                 value={formData.clubName}
                 onChange={(e) => handleInputChange('clubName', e.target.value)}
-                className="w-full bg-bg-main border border-main rounded-lg px-4 py-3 text-main placeholder-sub/60 focus:border-accent1 focus:outline-none"
+                className="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-pink-500 focus:outline-none"
                 placeholder="Ex: FC Montreuil"
                 required
               />
             </div>
 
-            {/* Localisation */}
+            {/* Location */}
             <div>
               <label className="block text-sm font-medium mb-2">
-                Localisation *
+                Location *
               </label>
               <input
                 type="text"
                 value={formData.location}
                 onChange={(e) => handleInputChange('location', e.target.value)}
-                className="w-full bg-bg-main border border-main rounded-lg px-4 py-3 text-main placeholder-sub/60 focus:border-accent1 focus:outline-none"
+                className="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-pink-500 focus:outline-none"
                 placeholder="Ex: Montreuil, France"
                 required
               />
             </div>
 
-            {/* Détails */}
+            {/* Details */}
             <div>
               <label className="block text-sm font-medium mb-2">
-                Détails du Club *
+                Club Details *
               </label>
               <textarea
                 value={formData.description}
                 onChange={(e) => handleInputChange('description', e.target.value)}
-                className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 h-32 resize-none"
-                placeholder="Décrivez votre club : histoire, niveau, nombre de joueurs, installations..."
+                className="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-900 placeholder-gray-400 h-32 resize-none focus:border-pink-500 focus:outline-none transition"
+                placeholder="Describe your club: history, level, number of players, facilities..."
                 required
               />
             </div>
 
-            {/* Email automatique depuis Privy */}
+            {/* Email auto from Privy */}
             <div>
               <label className="block text-sm font-medium mb-2">
-                Email de Contact
+                Contact Email
               </label>
-              <div className="w-full bg-accent-secondary/50 border border-accent-secondary rounded-lg px-4 py-3 text-text-secondary/80 flex items-center gap-2">
+              <div className="w-full bg-gray-100 border border-gray-200 rounded-lg px-4 py-3 text-gray-700 flex items-center gap-2">
                 <span>📧</span>
-                <span>{user?.email?.address || 'Email non disponible'}</span>
-                <span className="text-xs text-text-secondary/40 ml-auto">Depuis votre compte Privy</span>
+                <span>{user?.email?.address || 'Email not available'}</span>
+                <span className="text-xs text-gray-500 ml-auto">From your Privy account</span>
               </div>
             </div>
 
-            {/* Upload de documents PDF (fictif) */}
+            {/* PDF document upload (fake) */}
             <div>
               <label className="block text-sm font-medium mb-2">
-                Documents Justificatifs (PDF) *
+                Supporting Documents (PDF) *
               </label>
-              <div className="border-2 border-dashed border-accent-secondary rounded-lg p-6 text-center">
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
                 <input
                   type="file"
                   multiple
@@ -255,57 +271,58 @@ export default function RegisterClubPage() {
                 />
                 <label htmlFor="file-upload" className="cursor-pointer">
                   <div className="text-4xl mb-2">📄</div>
-                  <p className="text-lg font-medium mb-1">Déposez vos documents PDF</p>
-                  <p className="text-sm text-text-secondary/60 mb-3">
-                    Statuts, licence FFF, certificats, photos des installations...
+                  <p className="text-lg font-medium mb-1">Drop your PDF documents</p>
+                  <p className="text-sm text-gray-600 mb-3">
+                    Statutes, FFF license, certificates, facility photos...
                   </p>
-                  <div className="bg-accent-secondary hover:bg-accent-secondary/80 px-4 py-2 rounded-lg inline-block transition">
-                    Choisir les fichiers
+                  <div className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg inline-block transition">
+                    Choose files
                   </div>
                 </label>
               </div>
               
               {formData.documents.length > 0 && (
                 <div className="mt-4 space-y-2">
-                  <p className="text-sm font-medium text-accent-primary">
-                    {formData.documents.length} document(s) sélectionné(s) :
+                  <p className="text-sm font-medium" style={{color: '#fa0089'}}>
+                    {formData.documents.length} document(s) selected:
                   </p>
                   {formData.documents.map((file, index) => (
-                    <div key={index} className="flex items-center gap-2 text-sm bg-accent-secondary/50 rounded px-3 py-2">
+                    <div key={index} className="flex items-center gap-2 text-sm bg-gray-100 rounded px-3 py-2">
                       <span>📄</span>
                       <span>{file.name}</span>
-                      <span className="text-sub/60">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                      <span className="text-gray-500">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
                     </div>
                   ))}
                 </div>
               )}
             </div>
 
-            {/* Affichage des erreurs */}
+            {/* Error display */}
             {error && (
               <div className="bg-red-900/20 border border-red-500 rounded-lg p-4">
-                <h4 className="font-semibold text-red-400 mb-2">❌ Erreur</h4>
+                <h4 className="font-semibold text-red-400 mb-2">❌ Error</h4>
                 <p className="text-red-300 text-sm">{error}</p>
               </div>
             )}
 
-            {/* Bouton de soumission */}
+            {/* Submit button */}
             <button
               type="submit"
               disabled={isSubmitting || !formData.clubName || !formData.location || !formData.description}
               className={`w-full py-4 px-6 rounded-lg font-semibold text-lg transition ${
                 isSubmitting || !formData.clubName || !formData.location || !formData.description
-                  ? 'bg-bg-main/50 cursor-not-allowed text-sub/60'
-                  : 'bg-accent1 hover:bg-accent1/80 text-black transform hover:scale-105'
+                  ? 'bg-gray-300 cursor-not-allowed text-gray-500'
+                  : 'text-white hover:opacity-90 transform hover:scale-105'
               }`}
+              style={!(isSubmitting || !formData.clubName || !formData.location || !formData.description) ? {backgroundColor: '#fa0089'} : {}}
             >
               {isSubmitting ? (
                 <div className="flex items-center justify-center gap-3">
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  Envoi en cours...
+                  Sending...
                 </div>
               ) : (
-                '🚀 Soumettre la Demande'
+                '🚀 Submit Request'
               )}
             </button>
           </form>

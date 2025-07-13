@@ -78,7 +78,7 @@ export default function Home() {
         {/* Key Stats */}
         <div className="grid md:grid-cols-3 gap-8 mb-20">
           <div className="bg-white/80 backdrop-blur-sm border border-gray-200 p-8 rounded-xl text-center shadow-lg">
-            <div className="text-4xl font-bold mb-2" style={{color: '#fa0089'}}>€1-2</div>
+            <div className="text-4xl font-bold mb-2" style={{color: '#fa0089'}}>€1</div>
             <div className="text-gray-600">Token Price</div>
           </div>
           <div className="bg-white/80 backdrop-blur-sm border border-gray-200 p-8 rounded-xl text-center shadow-lg">
@@ -102,7 +102,7 @@ export default function Home() {
               <div className="relative z-10">
                 <div className="text-2xl mb-4">🏟️</div>
                 <h3 className="text-xl font-semibold mb-2 text-gray-900">Club Creates Tokens</h3>
-                <p className="text-gray-600">10,000 tokens at €1-2 each for genuine fan ownership</p>
+                <p className="text-gray-600">10,000 tokens at €1 each for genuine fan ownership</p>
               </div>
             </div>
             <div className="relative bg-white/80 backdrop-blur-sm p-6 rounded-xl overflow-hidden border border-gray-200 transition-all duration-300 group shadow-lg hover:border-[#fa0089]">

@@ -25,6 +25,7 @@ model User {
   votes         Vote[]
   pollResponses PollResponse[]
   clubRequests  ClubRequest[]
+  tokenHoldings UserToken[] // Tokens owned by user
 
   @@map("users")
 }
@@ -63,6 +64,7 @@ model Club {
   votes        Vote[]
   revenues     Revenue[]
   clubRequests ClubRequest[]
+  tokenHolders UserToken[] // Users who own tokens of this club
 
   @@map("clubs")
 }
@@ -194,6 +196,23 @@ model ClubRequest {
   club            Club?             @relation(fields: [clubId], references: [id])
 
   @@map("club_requests")
+}
+
+// User token holdings - tracks tokens owned by each user per club
+model UserToken {
+  id          String   @id @default(cuid())
+  amount      String   // Number of tokens owned (as string for big numbers)
+  purchasePrice String @default("0") // Price paid per token at purchase
+  purchasedAt DateTime @default(now())
+  
+  // Relations
+  userId      String
+  user        User     @relation(fields: [userId], references: [privyId])
+  clubId      String
+  club        Club     @relation(fields: [clubId], references: [id])
+
+  @@unique([userId, clubId]) // One record per user per club
+  @@map("user_tokens")
 }
 
 // Enums

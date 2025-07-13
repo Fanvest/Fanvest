@@ -9,13 +9,13 @@ import { ShinyButton } from '@/components/shiny-button';
 import { BuyTokensModal } from '@/components/club/BuyTokensModal';
 import { useTokenBalance } from '@/hooks/useTokenBalance';
 
-// Import dynamique du viewer 3D
+// Dynamic import of the 3D viewer
 const TokenViewer3D = dynamic(() => import('@/components/TokenViewer3D'), {
   ssr: false,
   loading: () => (
     <div className="text-center">
       <div className="w-20 h-20 border-2 rounded-full animate-spin mx-auto mb-2" style={{borderColor: '#fa0089', borderTopColor: 'transparent'}}></div>
-      <div className="text-sm text-gray-600">Chargement 3D...</div>
+      <div className="text-sm text-gray-600">Loading 3D...</div>
     </div>
   )
 });
@@ -86,7 +86,7 @@ export default function ClubDetailPage() {
   const router = useRouter();
   const { authenticated, user } = usePrivy();
 
-  // Fonction pour formater les nombres avec des espaces
+  // Function to format numbers with spaces
   const formatNumber = (num: number) => {
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
   };
@@ -97,14 +97,14 @@ export default function ClubDetailPage() {
   const [socialLinks, setSocialLinks] = useState<SocialLinks>({});
   const [polls, setPolls] = useState<Poll[]>([]);
   const [userVotes, setUserVotes] = useState<{ [pollId: string]: UserVote }>({});
-  // Utiliser le hook pour récupérer le solde réel de tokens
-  const { balance: userTokens, refetch: refetchBalance } = useTokenBalance(club?.tokenAddress);
+  // Use the hook to get the actual token balance from database
+  const { balance: userTokens, percentage: userPercentage, refetch: refetchBalance } = useTokenBalance(params.id as string);
   const [pollsLoading, setPollsLoading] = useState(false);
   const [pollsTab, setPollsTab] = useState<'active' | 'archived'>('active');
   const [showCryptoInfo, setShowCryptoInfo] = useState(false);
   const [showBuyModal, setShowBuyModal] = useState(false);
 
-  // Vérifier si l'utilisateur actuel est le propriétaire du club
+  // Check if current user is the club owner
   const isOwner = authenticated && user?.id && club?.owner?.privyId === user.id;
 
   useEffect(() => {
@@ -114,7 +114,7 @@ export default function ClubDetailPage() {
     }
   }, [params.id]);
 
-  // Pas besoin de loadUserTokens car le hook useTokenBalance gère ça automatiquement
+  // No need for loadUserTokens as the useTokenBalance hook handles this automatically
 
   useEffect(() => {
     if (authenticated && polls.length > 0) {
@@ -126,12 +126,12 @@ export default function ClubDetailPage() {
     try {
       setLoading(true);
       
-      // Charger les données du club
+      // Load club data
       const response = await fetch(`/api/clubs/${params.id}/settings`);
       if (response.ok) {
         const data = await response.json();
         
-        // Récupérer aussi les données de token
+        // Also get token data
         const tokenResponse = await fetch(`/api/clubs/${params.id}/token`);
         let tokenData = {};
         if (tokenResponse.ok) {
@@ -141,7 +141,7 @@ export default function ClubDetailPage() {
           }
         }
 
-        // Récupérer les données 3D du token
+        // Get token 3D data
         const token3DResponse = await fetch(`/api/clubs/${params.id}/token3d`);
         let token3DData = {};
         if (token3DResponse.ok) {
@@ -170,7 +170,7 @@ export default function ClubDetailPage() {
 
         setClub(clubData);
 
-        // Parser les liens sociaux
+        // Parse social links
         if (data.socialLinks) {
           try {
             setSocialLinks(JSON.parse(data.socialLinks));
@@ -179,11 +179,11 @@ export default function ClubDetailPage() {
           }
         }
       } else {
-        setError('Club introuvable');
+        setError('Club not found');
       }
     } catch (err) {
-      console.error('Erreur lors du chargement du club:', err);
-      setError('Erreur lors du chargement');
+      console.error('Error loading club:', err);
+      setError('Error loading');
     } finally {
       setLoading(false);
     }
@@ -192,20 +192,20 @@ export default function ClubDetailPage() {
   const loadPolls = async () => {
     try {
       setPollsLoading(true);
-      // Charger tous les sondages (actifs et fermés)
+      // Load all polls (active and closed)
       const response = await fetch(`/api/polls?clubId=${params.id}`);
       if (response.ok) {
         const pollsData = await response.json();
         setPolls(pollsData);
       }
     } catch (error) {
-      console.error('Erreur lors du chargement des sondages:', error);
+      console.error('Error loading polls:', error);
     } finally {
       setPollsLoading(false);
     }
   };
 
-  // Fonction supprimée - gérée par useTokenBalance hook
+  // Function removed - handled by useTokenBalance hook
 
   const loadUserVotes = async () => {
     if (!authenticated || !user?.id) return;
@@ -225,7 +225,7 @@ export default function ClubDetailPage() {
           }
         }
       } catch (error) {
-        console.error(`Erreur lors du chargement du vote pour ${poll.id}:`, error);
+        console.error(`Error loading vote for ${poll.id}:`, error);
       }
     }
     
@@ -249,20 +249,20 @@ export default function ClubDetailPage() {
       });
 
       if (response.ok) {
-        // Mettre à jour les votes locaux
+        // Update local votes
         setUserVotes(prev => ({
           ...prev,
           [pollId]: { optionId, tokenPower: userTokens.toString() }
         }));
         
-        // Recharger les résultats en temps réel
+        // Reload results in real-time
         loadPollResults(pollId);
         
-        // Recharger les sondages pour avoir les nouveaux totaux
+        // Reload polls to get new totals
         loadPolls();
       }
     } catch (error) {
-      console.error('Erreur lors du vote:', error);
+      console.error('Error while voting:', error);
     }
   };
 
@@ -272,6 +272,7 @@ export default function ClubDetailPage() {
 
   const canVote = (poll: Poll) => {
     return authenticated && 
+           userTokens > 0 && // User must own tokens to vote
            poll.status === 'ACTIVE' && 
            !isExpired(poll.endDate) &&
            !userVotes[poll.id];
@@ -290,17 +291,17 @@ export default function ClubDetailPage() {
         }));
       }
     } catch (error) {
-      console.error('Erreur lors du chargement des résultats:', error);
+      console.error('Error loading results:', error);
     }
   };
 
   const calculateResults = (poll: Poll) => {
     const results = pollResults[poll.id];
     if (!results) {
-      // Charger les résultats si pas encore disponibles
+      // Load results if not yet available
       loadPollResults(poll.id);
       
-      // Retourner des données temporaires en attendant
+      // Return temporary data while waiting
       return {
         totalVotes: 0,
         results: poll.options.map(option => ({
@@ -320,7 +321,7 @@ export default function ClubDetailPage() {
       percentage: result.relativePercentage || result.percentage
     }));
 
-    // Trouver le gagnant
+    // Find the winner
     const winner = mappedResults.reduce((prev, current) => 
       (prev.votes > current.votes) ? prev : current
     );
@@ -333,7 +334,7 @@ export default function ClubDetailPage() {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('fr-FR', {
+    return new Date(dateString).toLocaleDateString('en-US', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
@@ -343,12 +344,12 @@ export default function ClubDetailPage() {
   };
 
   const pollTypeLabels: { [key: string]: string } = {
-    GOVERNANCE: '🏛️ Gouvernance',
-    COACH_SELECTION: '👨‍💼 Sélection d\'entraîneur',
-    BUDGET_ALLOCATION: '💰 Allocation budgétaire',
-    STRATEGY: '🎯 Stratégie',
-    FACILITY_IMPROVEMENT: '🏟️ Amélioration des installations',
-    OTHER: '📋 Autre'
+    GOVERNANCE: '🏛️ Governance',
+    COACH_SELECTION: '👨‍💼 Coach Selection',
+    BUDGET_ALLOCATION: '💰 Budget Allocation',
+    STRATEGY: '🎯 Strategy',
+    FACILITY_IMPROVEMENT: '🏟️ Facility Improvement',
+    OTHER: '📋 Other'
   };
 
   if (loading) {
@@ -363,7 +364,7 @@ export default function ClubDetailPage() {
         />
         <div className="text-center relative z-10">
           <div className="text-6xl mb-4">⚽</div>
-          <div className="text-xl font-semibold mb-2 text-gray-900">Chargement du club...</div>
+          <div className="text-xl font-semibold mb-2 text-gray-900">Club loading...</div>
           <div className="w-8 h-8 border-2 rounded-full animate-spin mx-auto" style={{borderColor: '#fa0089', borderTopColor: 'transparent'}}></div>
         </div>
       </div>
@@ -382,13 +383,13 @@ export default function ClubDetailPage() {
         />
         <div className="text-center relative z-10">
           <div className="text-6xl mb-4">❌</div>
-          <div className="text-xl font-semibold mb-4 text-gray-900">{error || 'Club introuvable'}</div>
+          <div className="text-xl font-semibold mb-4 text-gray-900">{error || 'Club not found'}</div>
           <ShinyButton 
             onClick={() => router.back()}
             className="px-6 py-3 font-semibold text-white"
             style={{backgroundColor: '#fa0089', '--primary': '250 0 137'}}
           >
-            Retour
+            Back
           </ShinyButton>
         </div>
       </div>
@@ -405,7 +406,7 @@ export default function ClubDetailPage() {
         className="opacity-30"
       />
       
-      {/* Token 3D en background - uniquement si le club a un token */}
+      {/* Token 3D in background - only if the club has a token */}
       {club.tokenAddress && typeof window !== 'undefined' && (
         <div className="fixed inset-0 z-0 opacity-10 pointer-events-none">
           <TokenViewer3D 
@@ -417,7 +418,7 @@ export default function ClubDetailPage() {
         </div>
       )}
       
-      {/* Contenu principal */}
+      {/* Main content */}
       <div className="relative z-10">
       {/* Navigation Header */}
       <nav className="bg-white/90 backdrop-blur-sm border-b border-gray-200 relative z-10">
@@ -436,7 +437,7 @@ export default function ClubDetailPage() {
                 onClick={() => window.location.href = '/explore'}
                 className="text-gray-600 hover:text-gray-900 transition"
               >
-                Explorer
+                Explore
               </button>
               <span className="text-gray-400">/</span>
               <span className="text-gray-600">{club.name}</span>
@@ -445,22 +446,22 @@ export default function ClubDetailPage() {
               onClick={() => router.back()}
               className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition"
             >
-              ← Retour
+              ← Back
             </button>
           </div>
         </div>
       </nav>
 
       <div className="max-w-6xl mx-auto px-6 py-12">
-        {/* En-tête du club */}
+        {/* Club header */}
         <div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-2xl p-8 mb-8 shadow-lg">
           <div className="flex flex-col md:flex-row items-start gap-8">
-            {/* Logo du club */}
+            {/* Club logo */}
             <div className="flex-shrink-0">
               {club.logo ? (
                 <img 
                   src={club.logo} 
-                  alt={`Logo ${club.name}`}
+                  alt={`${club.name} Logo`}
                   className="w-32 h-32 rounded-2xl object-cover border-2" style={{borderColor: '#fa0089'}}
                 />
               ) : (
@@ -470,7 +471,7 @@ export default function ClubDetailPage() {
               )}
             </div>
 
-            {/* Informations principales */}
+            {/* Main information */}
             <div className="flex-1">
               <h1 className="text-4xl font-bold mb-2 text-gray-900">{club.name}</h1>
               <div className="flex items-center gap-4 text-gray-600 mb-4">
@@ -479,7 +480,7 @@ export default function ClubDetailPage() {
                 </span>
                 {club.founded && (
                   <span className="flex items-center gap-2">
-                    📅 Fondé en {club.founded}
+                    📅 Founded in {club.founded}
                   </span>
                 )}
               </div>
@@ -490,10 +491,10 @@ export default function ClubDetailPage() {
                 </p>
               )}
 
-              {/* Réseaux sociaux */}
+              {/* Social media */}
               {(socialLinks.facebook || socialLinks.instagram || socialLinks.website) && (
                 <div className="space-y-3">
-                  <span className="text-gray-500 text-sm">Suivez-nous :</span>
+                  <span className="text-gray-500 text-sm">Follow us:</span>
                   <div className="flex items-center gap-3 flex-wrap">
                     {socialLinks.facebook && (
                       <a 
@@ -522,7 +523,7 @@ export default function ClubDetailPage() {
                         rel="noopener noreferrer"
                         className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg font-medium transition flex items-center gap-2 text-sm border border-gray-300"
                       >
-                        🌍 Site Web
+                        🌍 Website
                       </a>
                     )}
                   </div>
@@ -532,21 +533,21 @@ export default function ClubDetailPage() {
           </div>
         </div>
 
-        {/* Section Token */}
+        {/* Token Section */}
         {club.tokenAddress ? (
           !showCryptoInfo ? (
-            // Vue initiale - Informations en euros avec option CHZ
+            // Initial view - Information in euros with CHZ option
             <div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-2xl p-8 shadow-lg">
               <div className="text-center mb-6">
-                <h2 className="text-2xl font-bold mb-2 text-gray-900">Soutenez {club.name}</h2>
+                <h2 className="text-2xl font-bold mb-2 text-gray-900">Support {club.name}</h2>
                 <p className="text-gray-600">
-                  Devenez propriétaire d'une partie du club et participez aux décisions importantes
+                  Become an owner of part of the club and participate in important decisions
                 </p>
               </div>
               
-              {/* Informations en euros */}
+              {/* Information in euros */}
               <div className="bg-pink-50 border border-pink-200 rounded-lg p-6 mb-6">
-                <h3 className="text-lg font-semibold mb-4 text-center" style={{color: '#fa0089'}}>💰 Investissement</h3>
+                <h3 className="text-lg font-semibold mb-4 text-center" style={{color: '#fa0089'}}>💰 Investment</h3>
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="text-center">
                     <div className="text-2xl font-bold mb-1" style={{color: '#fa0089'}}>
@@ -555,7 +556,7 @@ export default function ClubDetailPage() {
                         'N/A'
                       }
                     </div>
-                    <div className="text-gray-600 text-sm">Prix d'une part (1%)</div>
+                    <div className="text-gray-600 text-sm">Price of one share (1%)</div>
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold mb-1" style={{color: '#fa0089'}}>
@@ -564,19 +565,42 @@ export default function ClubDetailPage() {
                         'N/A'
                       }
                     </div>
-                    <div className="text-gray-600 text-sm">Valeur totale du projet</div>
+                    <div className="text-gray-600 text-sm">Total project value</div>
                   </div>
                 </div>
               </div>
               
-              {/* Boutons d'action */}
+              {/* User Token Balance */}
+              {authenticated && userTokens > 0 && (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+                  <h3 className="font-semibold mb-3 text-green-800">🎯 Your Participation</h3>
+                  <div className="grid md:grid-cols-3 gap-4 text-center">
+                    <div>
+                      <div className="text-xl font-bold text-green-700">{formatNumber(userTokens)}</div>
+                      <div className="text-green-600 text-sm">Tokens owned</div>
+                    </div>
+                    <div>
+                      <div className="text-xl font-bold text-green-700">{userPercentage.toFixed(2)}%</div>
+                      <div className="text-green-600 text-sm">Club share</div>
+                    </div>
+                    <div>
+                      <div className="text-xl font-bold text-green-700">
+                        {club.pricePerToken ? `${formatNumber(userTokens * parseInt(club.pricePerToken))} CHZ` : 'N/A'}
+                      </div>
+                      <div className="text-green-600 text-sm">Current value</div>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {/* Action buttons */}
               <div className="space-y-3">
                 {isOwner ? (
                   <div className="text-center p-4 bg-gray-100 rounded-lg border border-gray-200">
                     <div className="text-2xl mb-2">👑</div>
-                    <div className="font-semibold mb-1" style={{color: '#fa0089'}}>Vous êtes le propriétaire</div>
+                    <div className="font-semibold mb-1" style={{color: '#fa0089'}}>You are the owner</div>
                     <div className="text-sm text-gray-600">
-                      En tant que propriétaire, vous ne pouvez pas investir dans votre propre club
+                      As the owner, you cannot invest in your own club
                     </div>
                   </div>
                 ) : (
@@ -584,7 +608,7 @@ export default function ClubDetailPage() {
                     <ShinyButton 
                       onClick={() => {
                         if (!authenticated) {
-                          alert('Veuillez vous connecter pour investir');
+                          alert('Please login to invest');
                           return;
                         }
                         setShowBuyModal(true);
@@ -592,40 +616,40 @@ export default function ClubDetailPage() {
                       className="w-full py-3 px-6 text-lg font-semibold text-white" 
                       style={{backgroundColor: '#fa0089', '--primary': '250 0 137'}}
                     >
-                      💳 Investir en Euros
+                      💳 Invest in Euros
                     </ShinyButton>
                     <button 
                       onClick={() => setShowCryptoInfo(true)}
                       className="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 hover:text-gray-900 py-2 px-6 rounded-lg font-medium transition text-sm"
                     >
-                      🔗 Payer avec CHZ (crypto)
+                      🔗 Pay with CHZ (crypto)
                     </button>
                   </>
                 )}
               </div>
             </div>
           ) : (
-            // Vue crypto - Affichage des infos du token
+            // Crypto view - Display token info
             <div className="bg-pink-50 border border-pink-200 rounded-2xl p-8 shadow-lg">
               <div className="text-center mb-6">
-                <h2 className="text-xl font-bold" style={{color: '#fa0089'}}>Token du Club</h2>
+                <h2 className="text-xl font-bold" style={{color: '#fa0089'}}>Club Token</h2>
               </div>
               
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Symbole</span>
+                  <span className="text-gray-600">Symbol</span>
                   <span className="font-bold text-lg text-gray-900">{club.tokenSymbol}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Supply Total</span>
+                  <span className="text-gray-600">Total Supply</span>
                   <span className="font-bold text-gray-900">{club.totalSupply ? formatNumber(parseInt(club.totalSupply)) : 'N/A'}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Prix par Token</span>
+                  <span className="text-gray-600">Price per Token</span>
                   <span className="font-bold text-gray-900">{club.pricePerToken} CHZ</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Prix d'une part (1%)</span>
+                  <span className="text-gray-600">Price of one share (1%)</span>
                   <span className="font-bold" style={{color: '#fa0089'}}>
                     {club.pricePerToken && club.totalSupply ? 
                       `${formatNumber(parseInt(club.totalSupply) / 100 * parseInt(club.pricePerToken))} CHZ` : 
@@ -634,7 +658,7 @@ export default function ClubDetailPage() {
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Adresse</span>
+                  <span className="text-gray-600">Address</span>
                   <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded">
                     {club.tokenAddress?.slice(0, 10)}...{club.tokenAddress?.slice(-8)}
                   </span>
@@ -644,16 +668,16 @@ export default function ClubDetailPage() {
               {isOwner ? (
                 <div className="text-center p-4 bg-gray-100 rounded-lg border border-gray-200 mt-6">
                   <div className="text-xl mb-2">👑</div>
-                  <div className="font-semibold mb-1" style={{color: '#fa0089'}}>Propriétaire du club</div>
+                  <div className="font-semibold mb-1" style={{color: '#fa0089'}}>You are the owner of the club</div>
                   <div className="text-sm text-gray-600">
-                    Vous ne pouvez pas investir dans votre propre club
+                    You cannot invest in your own club
                   </div>
                 </div>
               ) : (
                 <ShinyButton 
                   onClick={() => {
                     if (!authenticated) {
-                      alert('Veuillez vous connecter pour investir');
+                      alert('Please login to invest');
                       return;
                     }
                     setShowBuyModal(true);
@@ -661,7 +685,7 @@ export default function ClubDetailPage() {
                   className="w-full mt-6 py-3 px-6 font-semibold text-white" 
                   style={{backgroundColor: '#fa0089', '--primary': '250 0 137'}}
                 >
-                  💰 Investir dans {club.tokenSymbol}
+                  💰 Invest in {club.tokenSymbol}
                 </ShinyButton>
               )}
               
@@ -669,30 +693,30 @@ export default function ClubDetailPage() {
                 onClick={() => setShowCryptoInfo(false)}
                 className="w-full mt-2 text-gray-500 hover:text-gray-800 text-sm transition"
               >
-                ← Retour
+                ← Back
               </button>
             </div>
           )
         ) : (
           <div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-2xl p-8 text-center shadow-lg">
             <div className="text-6xl mb-4">🚀</div>
-            <h2 className="text-2xl font-bold mb-2 text-gray-900">Token à venir</h2>
+            <h2 className="text-2xl font-bold mb-2 text-gray-900">Token Coming Soon</h2>
             <p className="text-gray-600 mb-6">
-              Ce club n'a pas encore lancé son token. Restez connecté pour être informé du lancement !
+              This club has not launched its token yet. Stay tuned to be notified when it goes live!
             </p>
             <ShinyButton className="px-6 py-3 font-semibold text-white" style={{backgroundColor: '#fa0089', '--primary': '250 0 137'}}>
-              🔔 Me notifier du lancement
+              🔔 Notify me at launch
             </ShinyButton>
           </div>
         )}
 
-        {/* Section Sondages */}
+        {/* Polls Section */}
         {polls.length > 0 && (
           <div className="mt-8">
             <div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-2xl p-8 shadow-lg">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold flex items-center gap-3 text-gray-900">
-                  📊 Sondages du Club
+                  📊 Club Polls
                 </h2>
               </div>
 
@@ -707,7 +731,7 @@ export default function ClubDetailPage() {
                   }`}
                   style={pollsTab === 'active' ? {backgroundColor: '#fa0089'} : {}}
                 >
-                  Sondages actifs
+                  Active Polls
                 </button>
                 <button
                   onClick={() => setPollsTab('archived')}
@@ -718,14 +742,14 @@ export default function ClubDetailPage() {
                   }`}
                   style={pollsTab === 'archived' ? {backgroundColor: '#fa0089'} : {}}
                 >
-                  Sondages clôturés
+                  Closed Polls
                 </button>
               </div>
 
               {pollsLoading ? (
                 <div className="text-center py-8">
                   <div className="w-8 h-8 border-2 rounded-full animate-spin mx-auto mb-2" style={{borderColor: '#fa0089', borderTopColor: 'transparent'}}></div>
-                  <div className="text-sm text-gray-600">Chargement des sondages...</div>
+                  <div className="text-sm text-gray-600">Loading polls...</div>
                 </div>
               ) : (
                 <div className="space-y-6">
@@ -750,7 +774,7 @@ export default function ClubDetailPage() {
                           ? 'bg-white/90 backdrop-blur-sm shadow-lg' 
                           : 'bg-gray-50/80 backdrop-blur-sm shadow-sm'
                       }`}>
-                        {/* En-tête du sondage */}
+                        {/* Poll header */}
                         <div className="mb-4">
                           <div className="flex items-center gap-3 mb-2">
                             <span className="text-sm bg-pink-100 px-2 py-1 rounded font-medium" style={{color: '#fa0089'}}>
@@ -758,12 +782,12 @@ export default function ClubDetailPage() {
                             </span>
                             {!isArchived && (
                               <span className="text-sm bg-green-100 text-green-700 px-2 py-1 rounded font-medium">
-                                🟢 Actif
+                                🟢 Active
                               </span>
                             )}
                             {hasVoted && (
                               <span className="text-sm bg-blue-100 text-blue-700 px-2 py-1 rounded font-medium">
-                                ✅ Voté ({userVotes[poll.id]?.tokenPower} tokens)
+                                ✅ Voted ({userVotes[poll.id]?.tokenPower} tokens)
                               </span>
                             )}
                           </div>
@@ -771,24 +795,24 @@ export default function ClubDetailPage() {
                             {poll.title}
                             {isArchived && winner && (
                               <span className="ml-3 text-sm font-normal" style={{color: '#fa0089'}}>
-                                🏆 Gagnant: {winner.text} ({winner.votes} tokens)
+                                🏆 Winner: {winner.text} ({winner.votes} tokens)
                               </span>
                             )}
                           </h3>
                           <p className="text-gray-700 mb-3">{poll.description}</p>
                           <div className="text-sm text-gray-600">
-                            Fin: {formatDate(poll.endDate)} • {totalVotes} tokens exprimés
+                            End: {formatDate(poll.endDate)} • {totalVotes} tokens cast
                           </div>
                         </div>
 
-                        {/* Options et résultats */}
+                        {/* Options and results */}
                         <div className="space-y-3">
                           {results.map(option => {
                             const isWinner = isArchived && winner && option.id === winner.id;
                             
                             return (
                               <div key={option.id} className="relative group">
-                                {/* Barre de progression */}
+                                {/* Progress bar */}
                                 <div className="bg-gray-100 rounded-lg overflow-hidden">
                                   <div 
                                     className={`h-12 transition-all duration-500 flex items-center ${
@@ -798,7 +822,7 @@ export default function ClubDetailPage() {
                                     }`}
                                     style={{ width: `${Math.max(option.percentage, 2)}%` }}
                                   >
-                                    {/* Texte des tokens visible uniquement au survol pour les actifs, toujours visible pour les archivés */}
+                                    {/* Token text only visible on hover for active polls, always visible for archived */}
                                     <div className={`pl-4 text-sm font-medium text-white transition-opacity duration-300 ${
                                       isArchived ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
                                     }`}>
@@ -807,7 +831,7 @@ export default function ClubDetailPage() {
                                   </div>
                                 </div>
                                 
-                                {/* Texte de l'option */}
+                                {/* Option text */}
                                 <div className="absolute inset-0 flex items-center justify-between px-4">
                                   <span className={`font-medium text-gray-900 ${
                                     isWinner ? 'font-bold' : ''
@@ -816,19 +840,19 @@ export default function ClubDetailPage() {
                                     {isWinner && ' 🏆'}
                                   </span>
                                   
-                                  {/* Bouton de vote */}
+                                  {/* Vote button */}
                                   {canVote(poll) && (
                                     <button
                                       onClick={() => vote(poll.id, option.id)}
                                       className="text-white px-4 py-1 rounded text-sm font-semibold transition ml-4 hover:opacity-90"
                                       style={{backgroundColor: '#fa0089'}}
                                     >
-                                      Voter
+                                      Vote
                                     </button>
                                   )}
                                 </div>
 
-                                {/* Tooltip au survol pour afficher les détails */}
+                                {/* Tooltip on hover to display details */}
                                 {!isArchived && (
                                   <div className="absolute -top-2 left-4 bg-white border-2 rounded px-2 py-1 text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10 shadow-lg" style={{borderColor: '#fa0089'}}>
                                     <span style={{color: '#fa0089'}}>{option.votes} tokens ({option.percentage.toFixed(1)}%)</span>
@@ -839,17 +863,17 @@ export default function ClubDetailPage() {
                           })}
                         </div>
 
-                        {/* Résumé des résultats */}
+                        {/* Results summary */}
                         {pollResults[poll.id] && (
                           <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center text-sm">
                               <div>
                                 <div className="font-bold" style={{color: '#fa0089'}}>{pollResults[poll.id].totalTokensVoted}</div>
-                                <div className="text-gray-600">Tokens votés</div>
+                                <div className="text-gray-600">Tokens voted</div>
                               </div>
                               <div>
                                 <div className="font-bold" style={{color: '#fa0089'}}>{pollResults[poll.id].totalVoters}</div>
-                                <div className="text-gray-600">Votants</div>
+                                <div className="text-gray-600">Voters</div>
                               </div>
                               <div>
                                 <div className="font-bold" style={{color: '#fa0089'}}>{pollResults[poll.id].participationRate?.toFixed(1)}%</div>
@@ -857,16 +881,17 @@ export default function ClubDetailPage() {
                               </div>
                               <div>
                                 <div className="font-bold" style={{color: '#fa0089'}}>{pollResults[poll.id].totalSupply}</div>
-                                <div className="text-gray-600">Tokens total</div>
+                                <div className="text-gray-600">Total tokens</div>
                               </div>
                             </div>
                           </div>
                         )}
 
-                        {/* Message si ne peut pas voter */}
+                        {/* Message if cannot vote */}
                         {!isArchived && !canVote(poll) && !hasVoted && (
                           <div className="mt-4 text-center text-gray-500 text-sm">
-                            {!authenticated ? '🔒 Connectez-vous pour voter' : ''}
+                            {!authenticated ? '🔒 Connect to vote' : 
+                             userTokens === 0 ? '💰 Buy tokens to participate in votes' : ''}
                           </div>
                         )}
                       </div>
@@ -880,7 +905,7 @@ export default function ClubDetailPage() {
       </div>
       </div>
       
-      {/* Modal d'achat de tokens */}
+      {/* Buy tokens modal */}
       {club && club.tokenAddress && (
         <BuyTokensModal
           isOpen={showBuyModal}

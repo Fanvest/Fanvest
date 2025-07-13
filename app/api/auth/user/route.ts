@@ -11,10 +11,10 @@ export async function GET(request: NextRequest) {
 
     console.log('Auth request params:', { privyId, walletAddress, email });
 
-    if (!privyId || !walletAddress) {
-      console.log('Missing required params');
+    if (!privyId) {
+      console.log('Missing required privyId');
       return NextResponse.json(
-        { error: 'Missing privyId or walletAddress' },
+        { error: 'Missing privyId' },
         { status: 400 }
       );
     }
@@ -42,8 +42,8 @@ export async function GET(request: NextRequest) {
       user = await prisma.user.create({
         data: {
           privyId,
-          walletAddress,
-          email
+          walletAddress: walletAddress || null,
+          email: email || null
         },
         include: {
           clubs: {
@@ -58,8 +58,8 @@ export async function GET(request: NextRequest) {
       });
       console.log('Created user:', user.id);
     } else {
-      // Update wallet address if it changed
-      if (user.walletAddress !== walletAddress) {
+      // Update wallet address if it changed and is provided
+      if (walletAddress && user.walletAddress !== walletAddress) {
         user = await prisma.user.update({
           where: { id: user.id },
           data: { walletAddress },

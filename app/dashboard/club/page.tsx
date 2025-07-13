@@ -200,7 +200,7 @@ export default function ClubDashboardPage() {
         className="opacity-30"
       />
       
-      {/* Token 3D en background - uniquement si les données 3D existent */}
+      {/* 3D Token in background - only if 3D data exists */}
       {(token3DData.texture || token3DData.bandColor !== '#ffd700') && typeof window !== 'undefined' && (
         <div className="fixed inset-0 z-0 opacity-10 pointer-events-none">
           <TokenViewer3D 
@@ -212,9 +212,9 @@ export default function ClubDashboardPage() {
         </div>
       )}
       
-      {/* Contenu principal */}
+      {/* Main content */}
       <div className="relative z-10">
-        {/* Header moderne et minimaliste */}
+        {/* Modern and minimalist header */}
         <div className="border-b border-gray-200 bg-white/90 backdrop-blur-sm">
           <div className="max-w-[95vw] mx-auto px-6 py-3">
             <div className="flex items-center justify-between">
@@ -227,7 +227,7 @@ export default function ClubDashboardPage() {
                   FanStock
                 </button>
                 <div className="text-sm text-gray-600 font-medium">
-                  {userClub ? `Dashboard · ${userClub.name}` : 'Dashboard Club'}
+                  {userClub ? `Dashboard · ${userClub.name}` : 'Club Dashboard'}
                 </div>
               </div>
               <div className="flex items-center gap-3">
@@ -236,14 +236,14 @@ export default function ClubDashboardPage() {
                     onClick={() => window.location.href = `/clubs/${userClub.id}`}
                     className="text-sm text-gray-600 hover:text-gray-900 transition flex items-center gap-1"
                   >
-                    👁️ Page publique
+                    👁️ Public page
                   </button>
                 )}
                 <button 
                   onClick={() => window.location.href = '/'}
                   className="text-sm text-gray-600 hover:text-gray-900 transition"
                 >
-                  ← Accueil
+                  ← Home
                 </button>
               </div>
             </div>
@@ -255,35 +255,35 @@ export default function ClubDashboardPage() {
           {userClub ? (
             <div className="space-y-6">
               
-              {/* Titre du club */}
+              {/* Club title */}
               <div className="flex items-center justify-between">
                 <div>
                   <h1 className="text-3xl font-bold flex items-center gap-3 text-gray-900">
                     👑 {userClub.name}
                   </h1>
                   <p className="text-gray-600 mt-2">
-                    {loadingClub ? 'Chargement...' : 'Gérez votre club, tokens et communauté'}
+                    {loadingClub ? 'Loading...' : 'Manage your club, tokens and community'}
                   </p>
                 </div>
                 
-                {/* Actions rapides */}
+                {/* Quick actions */}
                 <div className="flex items-center gap-3">
                   <button 
                     onClick={() => window.location.href = `/clubs/${userClub.id}/settings`}
                     className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg font-medium transition flex items-center gap-2"
                   >
-                    🎨 Personnaliser
+                    🎨 Customize
                   </button>
                   <button 
                     onClick={() => window.location.href = `/clubs/${userClub.id}`}
                     className="border border-gray-300 hover:border-gray-400 text-gray-700 hover:text-gray-900 px-4 py-2 rounded-lg font-medium transition flex items-center gap-2"
                   >
-                    👁️ Page Publique
+                    👁️ Public Page
                   </button>
                 </div>
               </div>
 
-              {/* Layout principal avec sidebar */}
+              {/* Main layout with sidebar */}
               <div className="grid grid-cols-12 gap-6">{/* Sidebar */}
                 <div className="col-span-3">
                   <div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl shadow-lg sticky top-6">
@@ -299,7 +299,7 @@ export default function ClubDashboardPage() {
                           }`}
                           style={activeSection === 'apercu' ? {backgroundColor: '#fa0089'} : {}}
                         >
-                          📊 Aperçu
+                          📊 Overview
                         </button>
                         <button
                           onClick={() => setActiveSection('token')}
@@ -310,7 +310,7 @@ export default function ClubDashboardPage() {
                           }`}
                           style={activeSection === 'token' ? {backgroundColor: '#fa0089'} : {}}
                         >
-                          🪙 Gestion du Token
+                          🪙 Token Management
                         </button>
                         <button
                           onClick={() => setActiveSection('sondages')}
@@ -321,7 +321,7 @@ export default function ClubDashboardPage() {
                           }`}
                           style={activeSection === 'sondages' ? {backgroundColor: '#fa0089'} : {}}
                         >
-                          🗳️ Sondages
+                          🗳️ Polls
                         </button>
                       </nav>
                       
@@ -330,23 +330,23 @@ export default function ClubDashboardPage() {
                   </div>
                 </div>
 
-                {/* Contenu principal */}
+                {/* Main content */}
                 <div className="col-span-9">
-                  {/* Contenu conditionnel selon la section active */}
+                  {/* Conditional content based on active section */}
                   {activeSection === 'apercu' && (
                     <div className="space-y-6">
                       <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-                        📊 Aperçu du Club
+                        📊 Club Overview
                       </h2>
                       
-                      {/* Métriques principales */}
+                      {/* Main metrics */}
                       <div className="grid grid-cols-3 gap-6">
                         <div className="bg-white/80 backdrop-blur-sm border border-gray-200 p-6 rounded-xl shadow-lg">
                           <div className="flex items-center gap-4">
                             <div className="text-3xl">👥</div>
                             <div>
                               <div className="text-3xl font-bold" style={{color: '#fa0089'}}>0</div>
-                              <div className="text-gray-600">Fans Actifs</div>
+                              <div className="text-gray-600">Active Fans</div>
                             </div>
                           </div>
                           <div className="mt-4 h-2 bg-pink-50 rounded-full">
@@ -359,7 +359,7 @@ export default function ClubDashboardPage() {
                             <div className="text-3xl">🗳️</div>
                             <div>
                               <div className="text-3xl font-bold" style={{color: '#fa0089'}}>0</div>
-                              <div className="text-gray-600">Sondages Actifs</div>
+                              <div className="text-gray-600">Active Polls</div>
                             </div>
                           </div>
                           <div className="mt-4 h-2 bg-pink-50 rounded-full">
@@ -372,7 +372,7 @@ export default function ClubDashboardPage() {
                             <div className="text-3xl">💰</div>
                             <div>
                               <div className="text-3xl font-bold" style={{color: '#fa0089'}}>€0</div>
-                              <div className="text-gray-600">Revenus Totaux</div>
+                              <div className="text-gray-600">Total Revenue</div>
                             </div>
                           </div>
                           <div className="mt-4 h-2 bg-pink-50 rounded-full">
@@ -381,13 +381,13 @@ export default function ClubDashboardPage() {
                         </div>
                       </div>
                       
-                      {/* Graphique d'activité */}
+                      {/* Activity chart */}
                       <div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl p-6 shadow-lg">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Activité Récente</h3>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
                         <div className="flex items-center justify-center h-32 bg-pink-50 rounded-lg">
                           <div className="text-gray-500 text-center">
                             <div className="text-4xl mb-2">📈</div>
-                            <div>Aucune activité récente</div>
+                            <div>No recent activity</div>
                           </div>
                         </div>
                       </div>
@@ -397,7 +397,7 @@ export default function ClubDashboardPage() {
                   {activeSection === 'token' && (
                     <div className="space-y-6">
                       <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-                        🪙 Gestion du Token
+                        🪙 Token Management
                       </h2>
                       
                       <div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl p-8 shadow-lg">
@@ -405,40 +405,40 @@ export default function ClubDashboardPage() {
                           <div className="text-3xl">🪙</div>
                           <div>
                             <h3 className="text-xl font-semibold text-gray-900">
-                              {tokenData.exists ? 'Informations de votre token' : 'Créez le token de votre club'}
+                              {tokenData.exists ? 'Your token information' : 'Create your club token'}
                             </h3>
                             <p className="text-gray-600">
-                              {tokenData.exists ? 'Votre token est déployé et actif' : 'Configurez et déployez votre token de club'}
+                              {tokenData.exists ? 'Your token is deployed and active' : 'Configure and deploy your club token'}
                             </p>
                           </div>
                         </div>
 
                         {tokenData.exists ? (
-                          /* Token existe - Affichage en lecture seule */
+                          /* Token exists - Read-only display */
                           <div className="space-y-6">
                             <div className="bg-pink-50 border-2 rounded-xl p-6" style={{borderColor: '#fa0089'}}>
-                              <h4 className="text-lg font-semibold mb-4" style={{color: '#fa0089'}}>✅ Token Actif</h4>
+                              <h4 className="text-lg font-semibold mb-4" style={{color: '#fa0089'}}>✅ Active Token</h4>
                               <div className="grid grid-cols-2 gap-6">
                                 <div>
-                                  <label className="block text-sm font-medium mb-2 text-gray-600">Symbole</label>
+                                  <label className="block text-sm font-medium mb-2 text-gray-600">Symbol</label>
                                   <div className="bg-white border border-gray-200 rounded-lg px-4 py-3 text-gray-900 font-mono text-lg">
                                     {tokenData.symbol}
                                   </div>
                                 </div>
                                 <div>
-                                  <label className="block text-sm font-medium mb-2 text-gray-600">Prix par Token</label>
+                                  <label className="block text-sm font-medium mb-2 text-gray-600">Price per Token</label>
                                   <div className="bg-white border border-gray-200 rounded-lg px-4 py-3 text-gray-900 text-lg">
                                     {tokenData.pricePerToken} CHZ
                                   </div>
                                 </div>
                                 <div>
-                                  <label className="block text-sm font-medium mb-2 text-gray-600">Supply Totale</label>
+                                  <label className="block text-sm font-medium mb-2 text-gray-600">Total Supply</label>
                                   <div className="bg-white border border-gray-200 rounded-lg px-4 py-3 text-gray-900 text-lg">
                                     {parseInt(tokenData.totalSupply).toLocaleString()} tokens
                                   </div>
                                 </div>
                                 <div>
-                                  <label className="block text-sm font-medium mb-2 text-gray-600">Valeur Totale</label>
+                                  <label className="block text-sm font-medium mb-2 text-gray-600">Total Value</label>
                                   <div className="bg-white border border-gray-200 rounded-lg px-4 py-3 font-semibold text-lg" style={{color: '#fa0089'}}>
                                     {(parseInt(tokenData.totalSupply) * parseInt(tokenData.pricePerToken)).toLocaleString()} CHZ
                                   </div>
@@ -446,14 +446,14 @@ export default function ClubDashboardPage() {
                               </div>
                               <div className="mt-6 p-4 bg-gray-100 rounded-lg">
                                 <div className="flex justify-between items-center">
-                                  <span className="text-sm text-gray-600">Adresse du contrat :</span>
+                                  <span className="text-sm text-gray-600">Contract address:</span>
                                   <span className="font-mono text-sm" style={{color: '#fa0089'}}>{tokenData.address.slice(0, 20)}...</span>
                                 </div>
                               </div>
                             </div>
                           </div>
                         ) : (
-                          /* Token n'existe pas - Formulaire de création */
+                          /* Token doesn't exist - Creation form */
                           <form onSubmit={handleCreateToken} className="space-y-6">
                             {error && (
                               <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-600">
@@ -463,7 +463,7 @@ export default function ClubDashboardPage() {
                             
                             <div className="grid grid-cols-2 gap-6">
                               <div>
-                                <label className="block text-sm font-medium mb-2 text-gray-600">Nom du Token</label>
+                                <label className="block text-sm font-medium mb-2 text-gray-600">Token Name</label>
                                 <input
                                   type="text"
                                   value={formData.tokenName}
@@ -474,7 +474,7 @@ export default function ClubDashboardPage() {
                                 />
                               </div>
                               <div>
-                                <label className="block text-sm font-medium mb-2 text-gray-600">Symbole (3-5 lettres)</label>
+                                <label className="block text-sm font-medium mb-2 text-gray-600">Symbol (3-5 letters)</label>
                                 <input
                                   type="text"
                                   value={formData.tokenSymbol}
@@ -485,7 +485,7 @@ export default function ClubDashboardPage() {
                                 />
                               </div>
                               <div>
-                                <label className="block text-sm font-medium mb-2 text-gray-600">Nombre de Tokens (min: 1000)</label>
+                                <label className="block text-sm font-medium mb-2 text-gray-600">Number of Tokens (min: 1000)</label>
                                 <input
                                   type="text"
                                   value={formData.totalSupply}
@@ -496,7 +496,7 @@ export default function ClubDashboardPage() {
                                 />
                               </div>
                               <div>
-                                <label className="block text-sm font-medium mb-2 text-gray-600">Prix par Token (CHZ)</label>
+                                <label className="block text-sm font-medium mb-2 text-gray-600">Price per Token (CHZ)</label>
                                 <input
                                   type="text"
                                   value={formData.pricePerToken}
@@ -508,26 +508,26 @@ export default function ClubDashboardPage() {
                               </div>
                             </div>
 
-                            {/* Résumé */}
+                            {/* Summary */}
                             {(formData.totalSupply || formData.pricePerToken) && (
                               <div className="bg-pink-50 border-2 rounded-lg p-4" style={{borderColor: '#fa0089'}}>
-                                <h4 className="font-semibold mb-3" style={{color: '#fa0089'}}>📊 Résumé</h4>
+                                <h4 className="font-semibold mb-3" style={{color: '#fa0089'}}>📊 Summary</h4>
                                 <div className="space-y-2">
                                   {formData.totalSupply && (
                                     <div className="flex justify-between">
-                                      <span className="text-gray-600">Supply totale :</span>
+                                      <span className="text-gray-600">Total supply:</span>
                                       <span className="text-gray-900">{parseInt(formData.totalSupply).toLocaleString()} tokens</span>
                                     </div>
                                   )}
                                   {formData.pricePerToken && (
                                     <div className="flex justify-between">
-                                      <span className="text-gray-600">Prix unitaire :</span>
+                                      <span className="text-gray-600">Unit price:</span>
                                       <span className="text-gray-900">{formData.pricePerToken} CHZ</span>
                                     </div>
                                   )}
                                   {formData.totalSupply && formData.pricePerToken && (
                                     <div className="flex justify-between font-semibold pt-2 border-t border-pink-200" style={{color: '#fa0089'}}>
-                                      <span>Valeur totale :</span>
+                                      <span>Total value:</span>
                                       <span>{(parseInt(formData.totalSupply) * parseInt(formData.pricePerToken)).toLocaleString()} CHZ</span>
                                     </div>
                                   )}
@@ -546,10 +546,10 @@ export default function ClubDashboardPage() {
                               {isCreating ? (
                                 <div className="flex items-center justify-center gap-3">
                                   <div className="w-4 h-4 border-2 border-gray-500 border-t-transparent rounded-full animate-spin"></div>
-                                  Création en cours...
+                                  Creating...
                                 </div>
                               ) : (
-                                '🚀 Créer le Token'
+                                '🚀 Create Token'
                               )}
                             </ShinyButton>
                           </form>
@@ -562,16 +562,16 @@ export default function ClubDashboardPage() {
                     <div className="space-y-6">
                       <div className="flex items-center justify-between">
                         <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-                          🗳️ Sondages
+                          🗳️ Polls
                         </h2>
                       </div>
                       
                       <div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl p-8 shadow-lg">
                         <div className="text-center py-12">
                           <div className="text-6xl mb-4">🗳️</div>
-                          <h3 className="text-xl font-semibold text-gray-900 mb-2">Aucun sondage pour le moment</h3>
+                          <h3 className="text-xl font-semibold text-gray-900 mb-2">No polls yet</h3>
                           <p className="text-gray-600 mb-6">
-                            Créez votre premier sondage pour engager votre communauté et prendre des décisions importantes ensemble.
+                            Create your first poll to engage your community and make important decisions together.
                           </p>
                           <div className="space-y-3">
                             <ShinyButton
@@ -579,14 +579,14 @@ export default function ClubDashboardPage() {
                               className="px-6 py-3 font-medium text-white"
                               style={{backgroundColor: '#fa0089', '--primary': '250 0 137'} as React.CSSProperties}
                             >
-                              📊 Créer votre premier sondage
+                              📊 Create your first poll
                             </ShinyButton>
                             <div>
                               <button
                                 onClick={() => window.location.href = `/clubs/${userClub.id}/polls`}
                                 className="text-gray-600 hover:text-gray-900 transition text-sm"
                               >
-                                Voir tous les sondages
+                                View all polls
                               </button>
                             </div>
                           </div>
@@ -598,19 +598,19 @@ export default function ClubDashboardPage() {
               </div>
             </div>
           ) : (
-            /* Aucun club trouvé */
+            /* No club found */
             <div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-lg p-8 text-center shadow-sm">
               <div className="text-4xl mb-4">🏗️</div>
-              <h2 className="text-xl font-bold mb-2 text-gray-900">Aucun Club Trouvé</h2>
+              <h2 className="text-xl font-bold mb-2 text-gray-900">No Club Found</h2>
               <p className="text-gray-600 mb-6 text-sm">
-                Vous devez d'abord créer un club avant de pouvoir gérer des tokens.
+                You must first create a club before you can manage tokens.
               </p>
               <ShinyButton
                 onClick={() => window.location.href = '/register-club'}
                 className="px-6 py-3 font-medium text-white"
                 style={{backgroundColor: '#fa0089', '--primary': '250 0 137'} as React.CSSProperties}
               >
-                🏆 Créer mon Club
+                🏆 Create my Club
               </ShinyButton>
             </div>
           )}

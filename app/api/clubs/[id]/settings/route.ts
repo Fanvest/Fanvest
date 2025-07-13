@@ -25,7 +25,7 @@ export async function GET(
     });
 
     if (!club) {
-      return NextResponse.json({ error: 'Club introuvable' }, { status: 404 });
+      return NextResponse.json({ error: 'Club not found' }, { status: 404 });
     }
 
     // Parser les liens sociaux s'ils existent
@@ -81,7 +81,7 @@ export async function PUT(
     });
 
     if (!existingClub) {
-      return NextResponse.json({ error: 'Club introuvable' }, { status: 404 });
+      return NextResponse.json({ error: 'Club not found' }, { status: 404 });
     }
 
     // Préparer les données à mettre à jour

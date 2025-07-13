@@ -65,6 +65,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Ensure user exists in database, create if not
+    let user = await prisma.user.findUnique({
+      where: { privyId: userId }
+    });
+
+    if (!user) {
+      console.log(`Creating user ${userId} automatically for club registration...`);
+      user = await prisma.user.create({
+        data: {
+          privyId: userId,
+          walletAddress: null,
+          email: contactEmail
+        }
+      });
+      console.log(`User ${userId} created successfully`);
+    }
+
     // Check if user already has a pending request
     const existingRequest = await prisma.clubRequest.findFirst({
       where: {

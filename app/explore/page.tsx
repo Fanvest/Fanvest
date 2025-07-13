@@ -40,7 +40,7 @@ export default function ExplorePage() {
         setClubs(data);
       }
     } catch (error) {
-      console.error('Erreur lors du chargement des clubs:', error);
+      console.error('Error loading clubs:', error);
     } finally {
       setLoading(false);
     }
@@ -71,7 +71,7 @@ export default function ExplorePage() {
         />
         <div className="text-center relative z-10">
           <div className="w-12 h-12 border-4 rounded-full animate-spin mx-auto mb-4" style={{borderColor: '#fa0089', borderTopColor: 'transparent'}}></div>
-          <p className="text-gray-600">Chargement des clubs...</p>
+          <p className="text-gray-600">Loading clubs...</p>
         </div>
       </div>
     );
@@ -100,13 +100,13 @@ export default function ExplorePage() {
                 FanStock
               </button>
               <span className="text-gray-400">/</span>
-              <span className="text-gray-600">Explorer les Clubs</span>
+              <span className="text-gray-600">Explore Clubs</span>
             </div>
             <button 
               onClick={() => window.location.href = '/'}
               className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition"
             >
-              ← Retour à l'accueil
+              ← Back to Home
             </button>
           </div>
         </div>
@@ -117,35 +117,29 @@ export default function ExplorePage() {
         <div className="max-w-7xl mx-auto px-6 py-8">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h1 className="text-4xl font-bold mb-2 text-gray-900">Explorer les Clubs</h1>
-              <p className="text-gray-600">Découvrez et investissez dans vos clubs favoris</p>
+              <h1 className="text-4xl font-bold mb-2 text-gray-900">Explore Clubs</h1>
+              <p className="text-gray-600">Discover and invest in your favorite clubs</p>
             </div>
             <div className="text-5xl">🏟️</div>
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-lg p-4 text-center shadow-lg">
               <div className="text-2xl font-bold" style={{color: '#fa0089'}}>{clubs.length}</div>
-              <div className="text-sm text-gray-600">Clubs Totaux</div>
+              <div className="text-sm text-gray-600">Total Clubs</div>
             </div>
             <div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-lg p-4 text-center shadow-lg">
               <div className="text-2xl font-bold" style={{color: '#fa0089'}}>
                 {clubs.filter(c => !!c.tokenAddress).length}
               </div>
-              <div className="text-sm text-gray-600">Avec Tokens</div>
+              <div className="text-sm text-gray-600">With Tokens</div>
             </div>
             <div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-lg p-4 text-center shadow-lg">
               <div className="text-2xl font-bold" style={{color: '#fa0089'}}>
                 {filteredClubs.length}
               </div>
-              <div className="text-sm text-gray-600">Clubs Visibles</div>
-            </div>
-            <div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-lg p-4 text-center shadow-lg">
-              <div className="text-2xl font-bold" style={{color: '#fa0089'}}>
-                {clubs.filter(c => c.founded).length}
-              </div>
-              <div className="text-sm text-gray-600">Avec Année</div>
+              <div className="text-sm text-gray-600">Visible Clubs</div>
             </div>
           </div>
         </div>
@@ -157,7 +151,7 @@ export default function ExplorePage() {
           <div className="flex-1">
             <input
               type="text"
-              placeholder="Rechercher par nom ou localisation..."
+              placeholder="Search by name or location..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full bg-white/90 border border-gray-300 rounded-lg px-4 py-3 text-gray-900 placeholder-gray-500 focus:border-[#fa0089] focus:outline-none shadow-sm"
@@ -169,11 +163,11 @@ export default function ExplorePage() {
         {filteredClubs.length === 0 ? (
           <div className="text-center py-12">
             <div className="text-6xl mb-4">🔍</div>
-            <h3 className="text-xl font-semibold mb-2 text-gray-900">Aucun club trouvé</h3>
+            <h3 className="text-xl font-semibold mb-2 text-gray-900">No club found</h3>
             <p className="text-gray-600">
               {clubs.length === 0 
-                ? "Aucun club n'est encore enregistré." 
-                : "Essayez de modifier vos critères de recherche."}
+                ? "No club has been registered yet." 
+                : "Try changing your search criteria."}
             </p>
           </div>
         ) : (
@@ -207,7 +201,7 @@ export default function ExplorePage() {
                   <div className="space-y-3 mb-4">
                     {club.founded && (
                       <div className="flex items-center gap-2 text-sm">
-                        <span className="text-gray-600">📅 Fondé en</span>
+                        <span className="text-gray-600">📅 Founded in</span>
                         <span className="text-gray-900">{club.founded}</span>
                       </div>
                     )}
@@ -224,14 +218,14 @@ export default function ExplorePage() {
                             <div className="font-medium text-gray-900">{stats.supply.toLocaleString()}</div>
                           </div>
                           <div>
-                            <div className="text-gray-600">Prix</div>
+                            <div className="text-gray-600">Price</div>
                             <div className="font-medium text-gray-900">€{stats.price.toFixed(2)}</div>
                           </div>
                         </div>
                       </div>
                     ) : (
                       <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-center">
-                        <span className="text-gray-600 text-sm">Pas encore de token</span>
+                        <span className="text-gray-600 text-sm">No token yet</span>
                       </div>
                     )}
                   </div>
@@ -241,11 +235,11 @@ export default function ExplorePage() {
                       onClick={() => window.location.href = `/clubs/${club.id}`}
                       className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg font-semibold transition text-sm"
                     >
-                      Voir Détails
+                      View Details
                     </button>
                     {stats.hasToken && (
                       <ShinyButton className="flex-1 px-4 py-2 text-sm font-semibold text-white" style={{backgroundColor: '#fa0089', '--primary': '250 0 137'}}>
-                        Investir
+                        Invest
                       </ShinyButton>
                     )}
                   </div>

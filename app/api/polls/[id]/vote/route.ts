@@ -60,6 +60,23 @@ export async function POST(
       );
     }
 
+    // Ensure user exists, create if not
+    let user = await prisma.user.findUnique({
+      where: { privyId: userId }
+    });
+
+    if (!user) {
+      console.log(`Creating user ${userId} automatically for voting...`);
+      user = await prisma.user.create({
+        data: {
+          privyId: userId,
+          walletAddress: null,
+          email: null
+        }
+      });
+      console.log(`User ${userId} created successfully`);
+    }
+
     // Check if user already voted
     const existingVote = await prisma.pollResponse.findUnique({
       where: {
@@ -86,7 +103,7 @@ export async function POST(
         include: {
           option: true,
           user: {
-            select: { id: true, walletAddress: true }
+            select: { privyId: true, walletAddress: true }
           }
         }
       });
@@ -104,7 +121,7 @@ export async function POST(
         include: {
           option: true,
           user: {
-            select: { id: true, walletAddress: true }
+            select: { privyId: true, walletAddress: true }
           }
         }
       });

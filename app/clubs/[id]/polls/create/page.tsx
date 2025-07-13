@@ -59,21 +59,21 @@ export default function CreatePollPage() {
     try {
       // Validation
       if (!formData.title.trim()) {
-        throw new Error('Le titre est requis');
+        throw new Error('Title is required');
       }
       if (!formData.description.trim()) {
-        throw new Error('La description est requise');
+        throw new Error('Description is required');
       }
       if (!formData.endDate) {
-        throw new Error('La date de fin est requise');
+        throw new Error('End date is required');
       }
       
       const validOptions = options.filter(opt => opt.text.trim());
       if (validOptions.length < 2) {
-        throw new Error('Au moins 2 options sont requises');
+        throw new Error('At least 2 options are required');
       }
 
-      // Créer le sondage
+      // Create the poll
       const response = await fetch('/api/polls', {
         method: 'POST',
         headers: {
@@ -97,7 +97,7 @@ export default function CreatePollPage() {
         router.push(`/clubs/${params.id}/polls`);
       } else {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Erreur lors de la création');
+        throw new Error(errorData.error || 'Error during creation');
       }
     } catch (err: any) {
       setError(err.message);
@@ -107,12 +107,12 @@ export default function CreatePollPage() {
   };
 
   const pollTypeLabels = {
-    GOVERNANCE: '🏛️ Gouvernance',
-    COACH_SELECTION: '👨‍💼 Sélection d\'entraîneur',
-    BUDGET_ALLOCATION: '💰 Allocation budgétaire',
-    STRATEGY: '🎯 Stratégie',
-    FACILITY_IMPROVEMENT: '🏟️ Amélioration des installations',
-    OTHER: '📋 Autre'
+    GOVERNANCE: '🏛️ Governance',
+    COACH_SELECTION: '👨‍💼 Coach Selection',
+    BUDGET_ALLOCATION: '💰 Budget Allocation',
+    STRATEGY: '🎯 Strategy',
+    FACILITY_IMPROVEMENT: '🏟️ Facility Improvement',
+    OTHER: '📋 Other'
   };
 
   if (!authenticated) {
@@ -127,7 +127,7 @@ export default function CreatePollPage() {
         />
         <div className="text-center relative z-10">
           <div className="text-6xl mb-4">🔒</div>
-          <div className="text-xl font-semibold text-gray-900">Connexion requise</div>
+          <div className="text-xl font-semibold text-gray-900">Login required</div>
         </div>
       </div>
     );
@@ -159,16 +159,16 @@ export default function CreatePollPage() {
                 onClick={() => window.location.href = `/clubs/${params.id}/polls`}
                 className="text-gray-600 hover:text-gray-900 transition"
               >
-                Sondages
+                Polls
               </button>
               <span className="text-gray-400">/</span>
-              <span className="text-gray-600">Créer un sondage</span>
+              <span className="text-gray-600">Create a poll</span>
             </div>
             <button 
               onClick={() => router.back()}
               className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition"
             >
-              ← Retour
+              ← Back
             </button>
           </div>
         </div>
@@ -178,30 +178,30 @@ export default function CreatePollPage() {
         <div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-2xl p-8 shadow-lg">
           <div className="text-center mb-8">
             <div className="text-6xl mb-4">📊</div>
-            <h1 className="text-3xl font-bold mb-2 text-gray-900">Créer un sondage</h1>
+            <h1 className="text-3xl font-bold mb-2 text-gray-900">Create a poll</h1>
             <p className="text-gray-600">
-              Consultez vos supporters pour les décisions importantes du club
+              Consult your supporters for important club decisions
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-8">
-            {/* Informations de base */}
+            {/* Basic Information */}
             <div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl p-6 shadow-lg">
               <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-gray-900">
-                📝 Informations de base
+                📝 Basic Information
               </h2>
               
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium mb-2 text-gray-600">
-                    Titre du sondage
+                    Poll title
                   </label>
                   <input
                     type="text"
                     value={formData.title}
                     onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
                     className="w-full bg-white border border-gray-300 focus:border-[#fa0089] rounded-lg px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none transition"
-                    placeholder="Ex: Choix du nouveau maillot domicile"
+                    placeholder="Ex: New home jersey selection"
                     maxLength={100}
                   />
                 </div>
@@ -214,7 +214,7 @@ export default function CreatePollPage() {
                     value={formData.description}
                     onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                     className="w-full bg-white border border-gray-300 focus:border-[#fa0089] rounded-lg px-4 py-3 text-gray-900 placeholder-gray-500 h-24 resize-none focus:outline-none transition"
-                    placeholder="Décrivez le contexte et l'enjeu de ce sondage..."
+                    placeholder="Describe the context and purpose of this poll..."
                     maxLength={500}
                   />
                 </div>
@@ -222,7 +222,7 @@ export default function CreatePollPage() {
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium mb-2 text-gray-600">
-                      Type de sondage
+                      Poll type
                     </label>
                     <select
                       value={formData.pollType}
@@ -240,13 +240,13 @@ export default function CreatePollPage() {
 
                   <div>
                     <label className="block text-sm font-medium mb-2 text-gray-600">
-                      Date de fin
+                      End date
                     </label>
                     <input
                       type="datetime-local"
                       value={formData.endDate}
                       onChange={(e) => setFormData(prev => ({ ...prev, endDate: e.target.value }))}
-                      min={new Date(Date.now() + 3600000).toISOString().slice(0, 16)} // Au moins 1h dans le futur
+                      min={new Date(Date.now() + 3600000).toISOString().slice(0, 16)} // At least 1h in the future
                       className="w-full bg-white border border-gray-300 focus:border-[#fa0089] rounded-lg px-4 py-3 text-gray-900 focus:outline-none transition"
                     />
                   </div>
@@ -255,11 +255,11 @@ export default function CreatePollPage() {
               </div>
             </div>
 
-            {/* Options du sondage */}
+            {/* Poll options */}
             <div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl p-6 shadow-lg">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-semibold flex items-center gap-2 text-gray-900">
-                  ☑️ Options de vote
+                  ☑️ Voting options
                 </h2>
                 <button
                   type="button"
@@ -268,7 +268,7 @@ export default function CreatePollPage() {
                   className="px-3 py-1 rounded text-sm font-semibold text-white transition disabled:opacity-50 hover:opacity-90"
                   style={{backgroundColor: '#fa0089'}}
                 >
-                  + Ajouter option
+                  + Add option
                 </button>
               </div>
               
@@ -300,18 +300,18 @@ export default function CreatePollPage() {
               </div>
               
               <p className="text-xs text-gray-600 mt-2">
-                Minimum 2 options, maximum 6. Le poids de chaque vote = nombre de tokens détenus.
+                Minimum 2 options, maximum 6. Each vote weight = number of tokens held.
               </p>
             </div>
 
-            {/* Messages d'erreur */}
+            {/* Error messages */}
             {error && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                 <p className="text-red-600 text-sm">{error}</p>
               </div>
             )}
 
-            {/* Boutons d'action */}
+            {/* Action buttons */}
             <div className="flex gap-4">
               <button
                 type="submit"
@@ -326,10 +326,10 @@ export default function CreatePollPage() {
                 {isCreating ? (
                   <div className="flex items-center justify-center gap-3">
                     <div className="w-5 h-5 border-2 border-gray-500 border-t-transparent rounded-full animate-spin"></div>
-                    Création en cours...
+                    Creating...
                   </div>
                 ) : (
-                  '📊 Créer le sondage'
+                  '📊 Create poll'
                 )}
               </button>
 
@@ -338,7 +338,7 @@ export default function CreatePollPage() {
                 onClick={() => router.back()}
                 className="px-6 py-4 border border-gray-300 hover:border-gray-400 text-gray-700 hover:text-gray-900 rounded-lg font-semibold transition"
               >
-                Annuler
+                Cancel
               </button>
             </div>
           </form>

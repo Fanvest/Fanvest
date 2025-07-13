@@ -29,7 +29,7 @@ export async function GET(
     });
 
     if (!poll) {
-      return NextResponse.json({ error: 'Sondage introuvable' }, { status: 404 });
+      return NextResponse.json({ error: 'Poll not found' }, { status: 404 });
     }
 
     // Récupérer toutes les réponses pour ce sondage

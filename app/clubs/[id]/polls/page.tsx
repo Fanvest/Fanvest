@@ -70,13 +70,13 @@ export default function ClubPollsPage() {
         setActivePolls(active);
         setArchivedPolls(archived);
 
-        // Charger les votes de l'utilisateur pour les sondages actifs
+        // Load user votes for active polls
         if (user && active.length > 0) {
           loadUserVotes(active.map((poll: Poll) => poll.id));
         }
       }
     } catch (error) {
-      console.error('Erreur lors du chargement des sondages:', error);
+      console.error('Error loading polls:', error);
     } finally {
       setLoading(false);
     }
@@ -100,7 +100,7 @@ export default function ClubPollsPage() {
           }
         }
       } catch (error) {
-        console.error(`Erreur lors du chargement du vote pour ${pollId}:`, error);
+        console.error(`Error loading vote for ${pollId}:`, error);
       }
     }
     
@@ -108,9 +108,9 @@ export default function ClubPollsPage() {
   };
 
   const loadUserTokens = async () => {
-    // Simuler le nombre de tokens de l'utilisateur
-    // Dans un vrai système, cela viendrait de la blockchain
-    setUserTokens(50); // Par défaut 50 tokens pour la démo
+    // Simulate the number of tokens for the user
+    // In a real system, this would come from the blockchain
+    setUserTokens(50); // Default 50 tokens for demo
   };
 
   const vote = async (pollId: string, optionId: string) => {
@@ -130,17 +130,17 @@ export default function ClubPollsPage() {
       });
 
       if (response.ok) {
-        // Mettre à jour les votes locaux
+        // Update local votes
         setUserVotes(prev => ({
           ...prev,
           [pollId]: { optionId, tokenPower: userTokens.toString() }
         }));
         
-        // Recharger les sondages pour avoir les nouveaux totaux
+        // Reload polls to get new totals
         loadPolls();
       }
     } catch (error) {
-      console.error('Erreur lors du vote:', error);
+      console.error('Error voting:', error);
     }
   };
 
@@ -158,7 +158,7 @@ export default function ClubPollsPage() {
         loadPolls();
       }
     } catch (error) {
-      console.error('Erreur lors de la clôture:', error);
+      console.error('Error closing poll:', error);
     }
   };
 
@@ -166,9 +166,9 @@ export default function ClubPollsPage() {
     const totalTokens = parseInt(poll.club.totalSupply || '0');
     if (totalTokens === 0) return { totalVotes: 0, results: [] };
 
-    // Simuler les résultats en fonction des votes
+    // Simulate results based on votes
     const results = poll.options.map(option => {
-      // Dans un vrai système, on calculerait le total des tokenPower pour chaque option
+      // In a real system, we would calculate the total tokenPower for each option
       const votes = Math.floor(Math.random() * (totalTokens / 4)); // Simulation
       return {
         ...option,
@@ -195,7 +195,7 @@ export default function ClubPollsPage() {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('fr-FR', {
+    return new Date(dateString).toLocaleDateString('en-US', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
@@ -205,12 +205,12 @@ export default function ClubPollsPage() {
   };
 
   const pollTypeLabels: { [key: string]: string } = {
-    GOVERNANCE: '🏛️ Gouvernance',
-    COACH_SELECTION: '👨‍💼 Sélection d\'entraîneur',
-    BUDGET_ALLOCATION: '💰 Allocation budgétaire',
-    STRATEGY: '🎯 Stratégie',
-    FACILITY_IMPROVEMENT: '🏟️ Amélioration des installations',
-    OTHER: '📋 Autre'
+    GOVERNANCE: '🏛️ Governance',
+    COACH_SELECTION: '👨‍💼 Coach Selection',
+    BUDGET_ALLOCATION: '💰 Budget Allocation',
+    STRATEGY: '🎯 Strategy',
+    FACILITY_IMPROVEMENT: '🏟️ Facility Improvement',
+    OTHER: '📋 Other'
   };
 
   if (loading) {
@@ -225,7 +225,7 @@ export default function ClubPollsPage() {
         />
         <div className="text-center">
           <div className="text-6xl mb-4">📊</div>
-          <div className="text-xl font-semibold mb-2 text-gray-900">Chargement des sondages...</div>
+          <div className="text-xl font-semibold mb-2 text-gray-900">Loading polls...</div>
           <div className="w-8 h-8 border-2 rounded-full animate-spin mx-auto relative z-10" style={{borderColor: '#fa0089', borderTopColor: 'transparent'}}></div>
         </div>
       </div>
@@ -261,13 +261,13 @@ export default function ClubPollsPage() {
                 Club
               </button>
               <span className="text-gray-400">/</span>
-              <span className="text-gray-600">Sondages</span>
+              <span className="text-gray-600">Polls</span>
             </div>
             <button 
               onClick={() => router.back()}
               className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition"
             >
-              ← Retour
+              ← Back
             </button>
           </div>
         </div>
@@ -279,10 +279,10 @@ export default function ClubPollsPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold mb-2 flex items-center gap-3 text-gray-900">
-                📊 Sondages du Club
+                📊 Club Polls
               </h1>
               <p className="text-gray-600">
-                Participez aux décisions importantes avec vos tokens (<span style={{color: '#fa0089', fontWeight: '600'}}>{userTokens} tokens</span>)
+                Participate in important decisions with your tokens 
               </p>
             </div>
             <button 
@@ -290,12 +290,12 @@ export default function ClubPollsPage() {
               className="px-6 py-3 rounded-lg font-semibold transition flex items-center gap-2 text-white hover:opacity-90"
               style={{backgroundColor: '#fa0089'}}
             >
-              ➕ Créer un sondage
+              ➕ Create Poll
             </button>
           </div>
         </div>
 
-        {/* Onglets */}
+        {/* Tabs */}
         <div className="flex bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl p-2 mb-8 shadow-lg">
           <button
             onClick={() => setActiveTab('active')}
@@ -306,7 +306,7 @@ export default function ClubPollsPage() {
             }`}
             style={activeTab === 'active' ? {backgroundColor: '#fa0089'} : {}}
           >
-            🔴 Sondages actifs ({activePolls.length})
+            🔴 Active Polls ({activePolls.length})
           </button>
           <button
             onClick={() => setActiveTab('archived')}
@@ -321,7 +321,7 @@ export default function ClubPollsPage() {
           </button>
         </div>
 
-        {/* Liste des sondages */}
+        {/* Poll List */}
         <div className="space-y-6">
           {(activeTab === 'active' ? activePolls : archivedPolls).map(poll => {
             const { results, totalVotes } = calculateResults(poll);
@@ -330,7 +330,7 @@ export default function ClubPollsPage() {
             
             return (
               <div key={poll.id} className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-2xl p-6 shadow-lg">
-                {/* En-tête du sondage */}
+                {/* Poll Header */}
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
@@ -339,19 +339,19 @@ export default function ClubPollsPage() {
                       </span>
                       {poll.status === 'ACTIVE' && expired && (
                         <span className="text-sm bg-orange-100 text-orange-600 px-2 py-1 rounded font-medium">
-                          ⏰ Expiré
+                          ⏰ Expired
                         </span>
                       )}
                       {hasVoted && (
                         <span className="text-sm bg-green-100 text-green-700 px-2 py-1 rounded font-medium">
-                          ✅ Voté ({userVotes[poll.id]?.tokenPower} tokens)
+                          ✅ Voted ({userVotes[poll.id]?.tokenPower} tokens)
                         </span>
                       )}
                     </div>
                     <h3 className="text-xl font-bold mb-2 text-gray-900">{poll.title}</h3>
                     <p className="text-gray-700 mb-3">{poll.description}</p>
                     <div className="text-sm text-gray-600">
-                      Fin: {formatDate(poll.endDate)} • <span style={{color: '#fa0089', fontWeight: '600'}}>{totalVotes} tokens votants</span>
+                      End: {formatDate(poll.endDate)} • <span style={{color: '#fa0089', fontWeight: '600'}}>{totalVotes} voting tokens</span>
                     </div>
                   </div>
                   
@@ -361,16 +361,16 @@ export default function ClubPollsPage() {
                       onClick={() => closePoll(poll.id)}
                       className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition"
                     >
-                      🔒 Clôturer
+                      🔒 Close Poll
                     </button>
                   )}
                 </div>
 
-                {/* Options et résultats */}
+                {/* Options and Results */}
                 <div className="space-y-3">
                   {results.map(option => (
                     <div key={option.id} className="relative">
-                      {/* Barre de progression */}
+                      {/* Progress Bar */}
                       <div className="bg-gray-100 rounded-lg overflow-hidden">
                         <div 
                           className="bg-gradient-to-r from-pink-200 to-pink-400 h-12 transition-all duration-500 flex items-center"
@@ -382,18 +382,18 @@ export default function ClubPollsPage() {
                         </div>
                       </div>
                       
-                      {/* Texte de l'option */}
+                      {/* Option Text */}
                       <div className="absolute inset-0 flex items-center justify-between px-4">
                         <span className="font-medium text-gray-900">{option.text}</span>
                         
-                        {/* Bouton de vote */}
+                        {/* Vote Button */}
                         {canVote(poll) && (
                           <button
                             onClick={() => vote(poll.id, option.id)}
                             className="text-white px-4 py-1 rounded text-sm font-semibold transition ml-4 hover:opacity-90"
                             style={{backgroundColor: '#fa0089'}}
                           >
-                            Voter ({userTokens} tokens)
+                            Vote ({userTokens} tokens)
                           </button>
                         )}
                       </div>
@@ -401,11 +401,11 @@ export default function ClubPollsPage() {
                   ))}
                 </div>
 
-                {/* Message si ne peut pas voter */}
+                {/* Message if cannot vote */}
                 {activeTab === 'active' && poll.status === 'ACTIVE' && !canVote(poll) && !hasVoted && (
                   <div className="mt-4 text-center text-gray-600 text-sm">
-                    {!authenticated ? '🔒 Connectez-vous pour voter' :
-                     expired ? '⏰ Sondage expiré' : ''}
+                    {!authenticated ? '🔒 Login to vote' :
+                     expired ? '⏰ Poll expired' : ''}
                   </div>
                 )}
               </div>
@@ -413,19 +413,19 @@ export default function ClubPollsPage() {
           })}
         </div>
 
-        {/* Message si aucun sondage */}
+        {/* Message if no polls */}
         {(activeTab === 'active' ? activePolls : archivedPolls).length === 0 && (
           <div className="text-center py-12">
             <div className="text-6xl mb-4">
               {activeTab === 'active' ? '📊' : '📁'}
             </div>
             <h3 className="text-xl font-semibold mb-2 text-gray-900">
-              {activeTab === 'active' ? 'Aucun sondage actif' : 'Aucun sondage archivé'}
+              {activeTab === 'active' ? 'No active polls' : 'No archived polls'}
             </h3>
             <p className="text-gray-600 mb-6">
               {activeTab === 'active' 
-                ? 'Créez le premier sondage pour consulter vos supporters'
-                : 'Les sondages terminés apparaîtront ici'
+                ? 'Create the first poll to consult your supporters'
+                : 'Completed polls will appear here'
               }
             </p>
             {activeTab === 'active' && (
@@ -434,7 +434,7 @@ export default function ClubPollsPage() {
                 className="text-white px-6 py-3 rounded-lg font-semibold transition hover:opacity-90"
                 style={{backgroundColor: '#fa0089'}}
               >
-                ➕ Créer un sondage
+                ➕ Create Poll
               </button>
             )}
           </div>
