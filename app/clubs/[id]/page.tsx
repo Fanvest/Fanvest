@@ -393,7 +393,20 @@ export default function ClubDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#16001D] to-[#330051] text-[#FEFEFE]">
+    <div className="min-h-screen bg-gradient-to-br from-[#16001D] to-[#330051] text-[#FEFEFE] relative">
+      {/* Token 3D en background - uniquement si le club a un token */}
+      {club.tokenAddress && typeof window !== 'undefined' && (
+        <div className="fixed inset-0 z-0 opacity-5 pointer-events-none">
+          <TokenViewer3D 
+            bandColor={club.tokenBandColor || '#8B4513'}
+            animationEnabled={true}
+            texture={club.tokenTexture || null}
+          />
+        </div>
+      )}
+      
+      {/* Contenu principal */}
+      <div className="relative z-10">
       {/* Navigation Header */}
       <nav className="bg-[#330051]/50 border-b border-[#330051]">
         <div className="max-w-7xl mx-auto px-6 py-4">
@@ -512,20 +525,6 @@ export default function ClubDetailPage() {
             // Vue initiale - Informations en euros avec option CHZ
             <div className="bg-[#330051]/30 border border-[#330051] rounded-2xl p-8">
               <div className="text-center mb-6">
-                <div className="h-32 mb-4 flex items-center justify-center">
-                  {typeof window !== 'undefined' ? (
-                    <TokenViewer3D 
-                      bandColor={club.tokenBandColor || '#8B4513'}
-                      animationEnabled={true} // Toujours animé sur la page publique
-                      texture={club.tokenTexture || null}
-                    />
-                  ) : (
-                    <div className="text-center">
-                      <div className="w-8 h-8 border-2 border-[#FA0089] border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-                      <div className="text-sm text-[#FEFEFE]/60">Chargement 3D...</div>
-                    </div>
-                  )}
-                </div>
                 <h2 className="text-2xl font-bold mb-2">Soutenez {club.name}</h2>
                 <p className="text-[#FEFEFE]/80">
                   Devenez propriétaire d'une partie du club et participez aux décisions importantes
@@ -571,23 +570,9 @@ export default function ClubDetailPage() {
               </div>
             </div>
           ) : (
-            // Vue crypto - Affichage des infos du token (sans background 3D car déjà visible en haut)
+            // Vue crypto - Affichage des infos du token
             <div className="bg-[#FA0089]/10 border border-[#FA0089] rounded-2xl p-8">
               <div className="text-center mb-6">
-                <div className="h-24 mb-4 flex items-center justify-center">
-                  {typeof window !== 'undefined' ? (
-                    <TokenViewer3D 
-                      bandColor={club.tokenBandColor || '#8B4513'}
-                      animationEnabled={true} // Toujours animé sur la page publique
-                      texture={club.tokenTexture || null}
-                    />
-                  ) : (
-                    <div className="text-center">
-                      <div className="w-6 h-6 border-2 border-[#FA0089] border-t-transparent rounded-full animate-spin mx-auto mb-1"></div>
-                      <div className="text-xs text-[#FEFEFE]/60">Chargement...</div>
-                    </div>
-                  )}
-                </div>
                 <h2 className="text-xl font-bold text-[#FA0089]">Token du Club</h2>
               </div>
               
@@ -834,6 +819,7 @@ export default function ClubDetailPage() {
             </div>
           </div>
         )}
+      </div>
       </div>
     </div>
   );
