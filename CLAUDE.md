@@ -70,6 +70,14 @@ FanStock - A decentralized platform enabling grassroots and amateur sports clubs
 - Full controls preserved in token creation interface
 - Owner investment restrictions with crown status indicator
 
+✅ **Animated Navigation System**
+- Modern navbar with Framer Motion hover animations
+- Conditional navigation based on user authentication and club ownership
+- Testnet-only display (mainnet hidden during development)
+- Dropdown menus for Fan and Club sections
+- Integrated Privy authentication and logout functionality
+- Supporting pages: portfolio, investments, how-it-works, club-benefits, pricing
+
 ## Current Tech Stack
 
 ### Frontend Framework
@@ -185,6 +193,7 @@ frontend/
 │   │   ├── OrbitControls.tsx # Camera controls
 │   │   └── TokenCreator3D.tsx # Complete 3D creator interface
 │   ├── ui/               # Base UI components
+│   │   └── navbar.tsx    # Animated navigation with conditional menus
 │   ├── web3/             # Web3-specific components
 │   ├── bg-pattern.tsx    # Background pattern component
 │   └── glowing-effect.tsx # UI effects
@@ -321,9 +330,10 @@ ClubRequests   # Registration requests (auto-approved for demo)
 
 ### **1. Landing Page**
 - Grid pattern background with custom palette
+- Animated navbar with conditional menus
 - Hero section with call-to-action buttons
 - Feature showcase with hover effects
-- Dynamic navigation based on user state (dashboard vs register)
+- Testnet indicator for development phase
 
 ### **2. Club Registration**
 - Single-page form with real-time validation
