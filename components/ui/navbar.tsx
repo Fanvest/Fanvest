@@ -125,34 +125,30 @@ export const FanStockNavbar = () => {
                 <MenuItem setActive={setActive} active={active} item="Mon Club">
                   <div className="flex flex-col space-y-2 text-sm min-w-[250px]">
                     {userClubs.map((club) => (
-                      <div key={club.id} className="group relative">
+                      <div key={club.id} className="group">
                         <div className="text-[#FEFEFE]/80 hover:text-[#FA0089] transition-colors py-1 px-2 hover:bg-[#FA0089]/10 rounded cursor-pointer">
                           🏆 {club.name}
                         </div>
-                        {/* Sous-menu qui apparaît à droite */}
-                        <div className="absolute left-full top-0 ml-1 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 z-[60]">
-                          <div className="bg-[#330051]/95 backdrop-blur-sm rounded-lg border border-[#FA0089]/30 shadow-xl p-3 min-w-[200px]">
-                            <div className="space-y-1">
-                              <a 
-                                href={`/clubs/${club.id}`}
-                                className="block text-[#FEFEFE]/80 hover:text-[#FA0089] transition-colors py-1 px-2 hover:bg-[#FA0089]/10 rounded text-sm"
-                              >
-                                👁️ Voir la page publique
-                              </a>
-                              <a 
-                                href={`/clubs/${club.id}/polls/create`}
-                                className="block text-[#FEFEFE]/80 hover:text-[#FA0089] transition-colors py-1 px-2 hover:bg-[#FA0089]/10 rounded text-sm"
-                              >
-                                📊 Créer un sondage
-                              </a>
-                              <a 
-                                href={`/clubs/${club.id}/settings`}
-                                className="block text-[#FEFEFE]/80 hover:text-[#FA0089] transition-colors py-1 px-2 hover:bg-[#FA0089]/10 rounded text-sm"
-                              >
-                                ⚙️ Paramètres du club
-                              </a>
-                            </div>
-                          </div>
+                        {/* Sous-menu qui apparaît en dessous */}
+                        <div className="pl-4 space-y-1 max-h-0 group-hover:max-h-40 overflow-hidden transition-all duration-300 ease-in-out">
+                          <a 
+                            href={`/clubs/${club.id}`}
+                            className="block text-[#FEFEFE]/60 hover:text-[#FA0089] transition-colors py-1 px-2 hover:bg-[#FA0089]/10 rounded text-sm"
+                          >
+                            👁️ Voir la page publique
+                          </a>
+                          <a 
+                            href={`/clubs/${club.id}/polls/create`}
+                            className="block text-[#FEFEFE]/60 hover:text-[#FA0089] transition-colors py-1 px-2 hover:bg-[#FA0089]/10 rounded text-sm"
+                          >
+                            📊 Créer un sondage
+                          </a>
+                          <a 
+                            href={`/clubs/${club.id}/settings`}
+                            className="block text-[#FEFEFE]/60 hover:text-[#FA0089] transition-colors py-1 px-2 hover:bg-[#FA0089]/10 rounded text-sm"
+                          >
+                            ⚙️ Paramètres du club
+                          </a>
                         </div>
                       </div>
                     ))}
