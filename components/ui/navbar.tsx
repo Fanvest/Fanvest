@@ -74,7 +74,7 @@ export const Menu = ({
   return (
     <nav
       onMouseLeave={() => setActive(null)}
-      className="relative rounded-full border border-accent-secondary bg-accent-secondary/30 backdrop-blur-sm shadow-lg flex justify-center space-x-12 px-12 py-4"
+      className="relative rounded-full border border-accent-secondary bg-accent-secondary/30 backdrop-blur-sm shadow-lg flex items-center justify-center space-x-8 px-8 py-3"
     >
       {children}
     </nav>
@@ -114,8 +114,8 @@ export const FanStockNavbar = () => {
     <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50">
       <Menu setActive={setActive}>
         {/* Logo/Accueil */}
-        <Link href="/" className="flex items-center">
-          <div className="text-2xl font-bold text-accent-primary hover:text-text-primary transition-colors">
+        <Link href="/" className="flex items-center mr-4">
+          <div className="text-xl font-bold text-accent-primary hover:text-text-primary transition-colors">
             FanStock
           </div>
         </Link>
@@ -189,12 +189,6 @@ export const FanStockNavbar = () => {
                     <HoveredLink href="/explore">
                       🔍 Explorer les clubs
                     </HoveredLink>
-                    <HoveredLink href="/portfolio">
-                      💼 Mon portefeuille
-                    </HoveredLink>
-                    <HoveredLink href="/investments">
-                      📈 Mes investissements
-                    </HoveredLink>
                   </div>
                 </MenuItem>
 
@@ -202,9 +196,6 @@ export const FanStockNavbar = () => {
                   <div className="flex flex-col space-y-2 text-sm">
                     <HoveredLink href="/register-club">
                       🏆 Créer mon club
-                    </HoveredLink>
-                    <HoveredLink href="/club-benefits">
-                      ⭐ Avantages club
                     </HoveredLink>
                   </div>
                 </MenuItem>
@@ -253,12 +244,6 @@ export const FanStockNavbar = () => {
               <div className="flex flex-col space-y-2 text-sm">
                 <HoveredLink href="/register-club">
                   🏆 Créer mon club
-                </HoveredLink>
-                <HoveredLink href="/club-benefits">
-                  ⭐ Avantages
-                </HoveredLink>
-                <HoveredLink href="/pricing">
-                  💰 Tarifs
                 </HoveredLink>
               </div>
             </MenuItem>

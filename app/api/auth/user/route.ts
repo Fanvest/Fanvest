@@ -1,24 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@/lib/generated/prisma';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/database';
 
 // GET /api/auth/user - Get or create user from Privy data
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const privyId = searchParams.get('privyId');
+    const walletAddress = searchParams.get('walletAddress');
+    const email = searchParams.get('email');
 
-    console.log('Auth request for privyId:', privyId);
+    console.log('Auth request params:', { privyId, walletAddress, email });
 
-    if (!privyId) {
+    if (!privyId || !walletAddress) {
+      console.log('Missing required params');
       return NextResponse.json(
-        { error: 'Missing privyId' },
+        { error: 'Missing privyId or walletAddress' },
         { status: 400 }
       );
     }
 
     // Try to find existing user
+    console.log('Looking for user with privyId:', privyId);
     let user = await prisma.user.findUnique({
       where: { privyId },
       include: {
@@ -32,13 +34,16 @@ export async function GET(request: NextRequest) {
         }
       }
     });
+    console.log('Found existing user:', user ? 'Yes' : 'No');
 
     if (!user) {
-      // Create new user with just privyId (Privy manages the rest)
-      console.log('Creating new user with privyId:', privyId);
+      // Create new user
+      console.log('Creating new user with data:', { privyId, walletAddress, email });
       user = await prisma.user.create({
         data: {
-          privyId
+          privyId,
+          walletAddress,
+          email
         },
         include: {
           clubs: {
@@ -51,7 +56,25 @@ export async function GET(request: NextRequest) {
           }
         }
       });
-      console.log('Created user:', user.privyId);
+      console.log('Created user:', user.id);
+    } else {
+      // Update wallet address if it changed
+      if (user.walletAddress !== walletAddress) {
+        user = await prisma.user.update({
+          where: { id: user.id },
+          data: { walletAddress },
+          include: {
+            clubs: {
+              select: {
+                id: true,
+                name: true,
+                logo: true,
+                location: true
+              }
+            }
+          }
+        }); 
+      }
     }
 
     return NextResponse.json(user);
@@ -82,9 +105,10 @@ export async function PATCH(request: NextRequest) {
     if (profileImage !== undefined) updateData.profileImage = profileImage;
 
     const user = await prisma.user.update({
-      where: { privyId: userId },
+      where: { id: userId },
       data: updateData,
       select: {
+        id: true,
         privyId: true,
         email: true,
         walletAddress: true,
