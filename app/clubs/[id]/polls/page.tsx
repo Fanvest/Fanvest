@@ -21,7 +21,6 @@ interface Poll {
   status: 'DRAFT' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
   startDate: string;
   endDate: string;
-  minTokens: string;
   createdAt: string;
   club: {
     id: string;
@@ -188,7 +187,7 @@ export default function ClubPollsPage() {
 
   const canVote = (poll: Poll) => {
     return authenticated && 
-           userTokens >= parseInt(poll.minTokens) && 
+ 
            poll.status === 'ACTIVE' && 
            !isExpired(poll.endDate) &&
            !userVotes[poll.id];
@@ -333,7 +332,7 @@ export default function ClubPollsPage() {
                     <h3 className="text-xl font-bold mb-2">{poll.title}</h3>
                     <p className="text-[#FEFEFE]/80 mb-3">{poll.description}</p>
                     <div className="text-sm text-[#FEFEFE]/60">
-                      Fin: {formatDate(poll.endDate)} • Min: {poll.minTokens} tokens • {totalVotes} tokens votants
+                      Fin: {formatDate(poll.endDate)} • {totalVotes} tokens votants
                     </div>
                   </div>
                   
@@ -386,7 +385,6 @@ export default function ClubPollsPage() {
                 {activeTab === 'active' && poll.status === 'ACTIVE' && !canVote(poll) && !hasVoted && (
                   <div className="mt-4 text-center text-[#FEFEFE]/60 text-sm">
                     {!authenticated ? '🔒 Connectez-vous pour voter' :
-                     userTokens < parseInt(poll.minTokens) ? `❌ ${poll.minTokens} tokens minimum requis (vous avez ${userTokens})` :
                      expired ? '⏰ Sondage expiré' : ''}
                   </div>
                 )}

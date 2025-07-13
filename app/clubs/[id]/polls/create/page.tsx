@@ -18,8 +18,7 @@ export default function CreatePollPage() {
     title: '',
     description: '',
     pollType: 'GOVERNANCE' as 'GOVERNANCE' | 'COACH_SELECTION' | 'BUDGET_ALLOCATION' | 'STRATEGY' | 'FACILITY_IMPROVEMENT' | 'OTHER',
-    endDate: '',
-    minTokens: '1'
+    endDate: ''
   });
   
   const [options, setOptions] = useState<PollOption[]>([
@@ -85,7 +84,6 @@ export default function CreatePollPage() {
           pollType: formData.pollType,
           startDate: new Date().toISOString(),
           endDate: new Date(formData.endDate).toISOString(),
-          minTokens: formData.minTokens,
           clubId: params.id,
           options: validOptions.map((opt, index) => ({
             text: opt.text.trim(),
@@ -238,21 +236,6 @@ export default function CreatePollPage() {
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Tokens minimum requis pour voter
-                  </label>
-                  <input
-                    type="number"
-                    value={formData.minTokens}
-                    onChange={(e) => setFormData(prev => ({ ...prev, minTokens: e.target.value }))}
-                    min="1"
-                    className="w-full bg-[#330051]/50 border border-[#330051] rounded-lg px-4 py-3 text-[#FEFEFE]"
-                  />
-                  <p className="text-xs text-[#FEFEFE]/60 mt-1">
-                    Les supporters ayant moins de tokens ne pourront pas voter
-                  </p>
-                </div>
               </div>
             </div>
 

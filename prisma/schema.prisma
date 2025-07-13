@@ -78,7 +78,6 @@ model Poll {
   // Voting configuration
   startDate   DateTime
   endDate     DateTime
-  minTokens   String?    // Minimum tokens required to vote
   
   // Metadata
   createdAt   DateTime   @default(now())

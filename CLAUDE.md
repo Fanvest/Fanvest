@@ -56,10 +56,12 @@ FanStock - A decentralized platform enabling grassroots and amateur sports clubs
 
 ✅ **Comprehensive Polling System**
 - Token-weighted voting (vote power = tokens held)
-- Poll creation with deadlines and minimum token requirements
+- Democratic poll creation (no minimum token requirements)
 - Active/archived poll management
 - Manual poll closure and automatic expiration
 - Real-time results visualization with progress bars
+- Disabled 3D token manipulation for stable viewing experience
+- Forced animations on public club pages
 
 ## Current Tech Stack
 
@@ -195,7 +197,7 @@ Clubs          # Club metadata + 3D token design data + social links
   - tokenBandColor   # Hex color for band
   - tokenAnimation   # Animation enabled/disabled
   - socialLinks      # JSON string with social media links
-Polls          # Off-chain governance polls with token requirements
+Polls          # Off-chain governance polls (no token restrictions)
 PollOptions    # Poll choices
 PollResponses  # User votes with tokenPower field
   - tokenPower       # Voting weight based on token holdings
@@ -272,7 +274,7 @@ ClubRequests   # Registration requests (auto-approved for demo)
 
 **POST `/api/polls`**
 - **Description**: Create new poll
-- **Body Parameters**: `title`, `description`, `pollType`, `endDate`, `minTokens`, `clubId`, `options`
+- **Body Parameters**: `title`, `description`, `pollType`, `endDate`, `clubId`, `options`
 - **Response**: Created poll with options
 
 **POST `/api/polls/[id]/vote`**
@@ -351,11 +353,12 @@ ClubRequests   # Registration requests (auto-approved for demo)
 - Token information and investment options
 
 ### **8. Polling System**
-- Poll creation with multiple types (governance, coach selection, etc.)
-- Token-weighted voting (50 tokens = 50 vote weight)
-- Active/archived poll management
-- Real-time results with progress bars
-- Deadline management and manual closure
+- Democratic poll creation with multiple types (governance, coach selection, etc.)
+- Token-weighted voting system (50 tokens = 50 vote weight)
+- Active/archived poll management with real-time switching
+- Real-time results with progress bars and hover tooltips
+- Deadline management and manual closure functionality
+- Fixed 3D token display (no user manipulation)
 
 ## Chiliz Chain Integration
 - Chain ID: 88888 (mainnet) / 88882 (testnet)

@@ -7,7 +7,17 @@ import { OrbitControls as ThreeOrbitControls } from 'three/examples/jsm/controls
 // Étendre R3F avec OrbitControls
 extend({ OrbitControls: ThreeOrbitControls });
 
-const OrbitControls: React.FC = () => {
+interface OrbitControlsProps {
+  enableZoom?: boolean;
+  enablePan?: boolean;
+  enableRotate?: boolean;
+}
+
+const OrbitControls: React.FC<OrbitControlsProps> = ({ 
+  enableZoom = true,
+  enablePan = true,
+  enableRotate = true
+}) => {
   const { camera, gl } = useThree();
   const controlsRef = useRef<any>();
 
@@ -15,13 +25,13 @@ const OrbitControls: React.FC = () => {
     if (controlsRef.current) {
       controlsRef.current.enableDamping = true;
       controlsRef.current.dampingFactor = 0.05;
-      controlsRef.current.enablePan = true;
-      controlsRef.current.enableZoom = true;
-      controlsRef.current.enableRotate = true;
+      controlsRef.current.enablePan = enablePan;
+      controlsRef.current.enableZoom = enableZoom;
+      controlsRef.current.enableRotate = enableRotate;
       controlsRef.current.minDistance = 3;
       controlsRef.current.maxDistance = 15;
     }
-  }, []);
+  }, [enableZoom, enablePan, enableRotate]);
 
   useFrame(() => {
     if (controlsRef.current) {

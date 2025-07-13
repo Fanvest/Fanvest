@@ -10,7 +10,7 @@ const TokenViewer3D = dynamic(() => import('@/components/TokenViewer3D'), {
   ssr: false,
   loading: () => (
     <div className="text-center">
-      <div className="w-8 h-8 border-2 border-[#FA0089] border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+      <div className="w-20 h-20 border-2 border-[#FA0089] border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
       <div className="text-sm text-[#FEFEFE]/60">Chargement 3D...</div>
     </div>
   )
@@ -60,7 +60,6 @@ interface Poll {
   status: 'DRAFT' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
   startDate: string;
   endDate: string;
-  minTokens: string;
   createdAt: string;
   club: {
     id: string;
@@ -82,6 +81,11 @@ export default function ClubDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { authenticated, user } = usePrivy();
+
+  // Fonction pour formater les nombres avec des espaces
+  const formatNumber = (num: number) => {
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  };
   
   const [club, setClub] = useState<Club | null>(null);
   const [loading, setLoading] = useState(true);
@@ -91,6 +95,8 @@ export default function ClubDetailPage() {
   const [userVotes, setUserVotes] = useState<{ [pollId: string]: UserVote }>({});
   const [userTokens, setUserTokens] = useState(0);
   const [pollsLoading, setPollsLoading] = useState(false);
+  const [pollsTab, setPollsTab] = useState<'active' | 'archived'>('active');
+  const [showCryptoInfo, setShowCryptoInfo] = useState(false);
 
   useEffect(() => {
     if (params.id) {
@@ -181,7 +187,8 @@ export default function ClubDetailPage() {
   const loadPolls = async () => {
     try {
       setPollsLoading(true);
-      const response = await fetch(`/api/polls?clubId=${params.id}&status=ACTIVE`);
+      // Charger tous les sondages (actifs et fermés)
+      const response = await fetch(`/api/polls?clubId=${params.id}`);
       if (response.ok) {
         const pollsData = await response.json();
         setPolls(pollsData);
@@ -277,7 +284,6 @@ export default function ClubDetailPage() {
 
   const canVote = (poll: Poll) => {
     return authenticated && 
-           userTokens >= parseInt(poll.minTokens) && 
            poll.status === 'ACTIVE' && 
            !isExpired(poll.endDate) &&
            !userVotes[poll.id];
@@ -313,19 +319,28 @@ export default function ClubDetailPage() {
           ...option,
           votes: 0,
           percentage: 0
-        }))
+        })),
+        winner: null
       };
     }
 
+    const mappedResults = results.results.map((result: any) => ({
+      id: result.id,
+      text: result.text,
+      order: result.order,
+      votes: result.tokenVotes,
+      percentage: result.relativePercentage || result.percentage
+    }));
+
+    // Trouver le gagnant
+    const winner = mappedResults.reduce((prev, current) => 
+      (prev.votes > current.votes) ? prev : current
+    );
+
     return {
       totalVotes: results.totalTokensVoted,
-      results: results.results.map((result: any) => ({
-        id: result.id,
-        text: result.text,
-        order: result.order,
-        votes: result.tokenVotes,
-        percentage: result.percentage
-      }))
+      results: mappedResults,
+      winner: winner.votes > 0 ? winner : null
     };
   };
 
@@ -493,12 +508,88 @@ export default function ClubDetailPage() {
 
         {/* Section Token */}
         {club.tokenAddress ? (
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Informations du token */}
+          !showCryptoInfo ? (
+            // Vue initiale - Informations en euros avec option CHZ
+            <div className="bg-[#330051]/30 border border-[#330051] rounded-2xl p-8">
+              <div className="text-center mb-6">
+                <div className="h-32 mb-4 flex items-center justify-center">
+                  {typeof window !== 'undefined' ? (
+                    <TokenViewer3D 
+                      bandColor={club.tokenBandColor || '#8B4513'}
+                      animationEnabled={true} // Toujours animé sur la page publique
+                      texture={club.tokenTexture || null}
+                    />
+                  ) : (
+                    <div className="text-center">
+                      <div className="w-8 h-8 border-2 border-[#FA0089] border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                      <div className="text-sm text-[#FEFEFE]/60">Chargement 3D...</div>
+                    </div>
+                  )}
+                </div>
+                <h2 className="text-2xl font-bold mb-2">Soutenez {club.name}</h2>
+                <p className="text-[#FEFEFE]/80">
+                  Devenez propriétaire d'une partie du club et participez aux décisions importantes
+                </p>
+              </div>
+              
+              {/* Informations en euros */}
+              <div className="bg-[#FA0089]/10 border border-[#FA0089] rounded-lg p-6 mb-6">
+                <h3 className="text-lg font-semibold text-[#FA0089] mb-4 text-center">💰 Investissement</h3>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-[#813066] mb-1">
+                      {club.pricePerToken && club.totalSupply ? 
+                        `${formatNumber(Math.round(parseInt(club.totalSupply) / 100 * parseInt(club.pricePerToken) * 0.85))} €` : 
+                        'N/A'
+                      }
+                    </div>
+                    <div className="text-[#FEFEFE]/60 text-sm">Prix d'une part (1%)</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-[#FA0089] mb-1">
+                      {club.pricePerToken && club.totalSupply ? 
+                        `${formatNumber(Math.round(parseInt(club.totalSupply) * parseInt(club.pricePerToken) * 0.85))} €` : 
+                        'N/A'
+                      }
+                    </div>
+                    <div className="text-[#FEFEFE]/60 text-sm">Valeur totale du projet</div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Boutons d'action */}
+              <div className="space-y-3">
+                <button className="w-full bg-[#FA0089] hover:bg-[#FA0089]/80 py-3 px-6 rounded-lg font-semibold transition text-lg">
+                  💳 Investir en Euros
+                </button>
+                <button 
+                  onClick={() => setShowCryptoInfo(true)}
+                  className="w-full bg-[#330051]/70 hover:bg-[#330051] text-[#FEFEFE]/80 hover:text-[#FEFEFE] py-2 px-6 rounded-lg font-medium transition text-sm"
+                >
+                  🔗 Payer avec CHZ (crypto)
+                </button>
+              </div>
+            </div>
+          ) : (
+            // Vue crypto - Affichage des infos du token (sans background 3D car déjà visible en haut)
             <div className="bg-[#FA0089]/10 border border-[#FA0089] rounded-2xl p-8">
-              <h2 className="text-2xl font-bold mb-6 text-[#FA0089] flex items-center gap-2">
-                🪙 Token du Club
-              </h2>
+              <div className="text-center mb-6">
+                <div className="h-24 mb-4 flex items-center justify-center">
+                  {typeof window !== 'undefined' ? (
+                    <TokenViewer3D 
+                      bandColor={club.tokenBandColor || '#8B4513'}
+                      animationEnabled={true} // Toujours animé sur la page publique
+                      texture={club.tokenTexture || null}
+                    />
+                  ) : (
+                    <div className="text-center">
+                      <div className="w-6 h-6 border-2 border-[#FA0089] border-t-transparent rounded-full animate-spin mx-auto mb-1"></div>
+                      <div className="text-xs text-[#FEFEFE]/60">Chargement...</div>
+                    </div>
+                  )}
+                </div>
+                <h2 className="text-xl font-bold text-[#FA0089]">Token du Club</h2>
+              </div>
               
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
@@ -507,11 +598,20 @@ export default function ClubDetailPage() {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-[#FEFEFE]/80">Supply Total</span>
-                  <span className="font-bold">{club.totalSupply}</span>
+                  <span className="font-bold">{club.totalSupply ? formatNumber(parseInt(club.totalSupply)) : 'N/A'}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-[#FEFEFE]/80">Prix par Token</span>
                   <span className="font-bold">{club.pricePerToken} CHZ</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-[#FEFEFE]/80">Prix d'une part (1%)</span>
+                  <span className="font-bold text-[#813066]">
+                    {club.pricePerToken && club.totalSupply ? 
+                      `${formatNumber(parseInt(club.totalSupply) / 100 * parseInt(club.pricePerToken))} CHZ` : 
+                      'N/A'
+                    }
+                  </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-[#FEFEFE]/80">Adresse</span>
@@ -524,27 +624,15 @@ export default function ClubDetailPage() {
               <button className="w-full mt-6 bg-[#FA0089] hover:bg-[#FA0089]/80 py-3 px-6 rounded-lg font-semibold transition">
                 💰 Investir dans {club.tokenSymbol}
               </button>
+              
+              <button 
+                onClick={() => setShowCryptoInfo(false)}
+                className="w-full mt-2 text-[#FEFEFE]/60 hover:text-[#FEFEFE] text-sm transition"
+              >
+                ← Retour
+              </button>
             </div>
-
-            {/* Visualisation 3D du token */}
-            <div className="bg-[#330051]/30 border border-[#330051] rounded-2xl p-8">
-              <h3 className="text-xl font-bold mb-4">🎨 Aperçu 3D du Token</h3>
-              <div className="h-64 bg-[#330051]/20 rounded-lg flex items-center justify-center">
-                {typeof window !== 'undefined' ? (
-                  <TokenViewer3D 
-                    bandColor={club.tokenBandColor || '#8B4513'}
-                    animationEnabled={club.tokenAnimation ?? true}
-                    texture={club.tokenTexture || null}
-                  />
-                ) : (
-                  <div className="text-center">
-                    <div className="w-8 h-8 border-2 border-[#FA0089] border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-                    <div className="text-sm text-[#FEFEFE]/60">Chargement 3D...</div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+          )
         ) : (
           <div className="bg-[#330051]/30 border border-[#330051] rounded-2xl p-8 text-center">
             <div className="text-6xl mb-4">🚀</div>
@@ -564,8 +652,32 @@ export default function ClubDetailPage() {
             <div className="bg-[#330051]/30 border border-[#330051] rounded-2xl p-8">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold flex items-center gap-3">
-                  📊 Sondages en cours
+                  📊 Sondages du Club
                 </h2>
+              </div>
+
+              {/* Tabs */}
+              <div className="flex gap-4 mb-6">
+                <button
+                  onClick={() => setPollsTab('active')}
+                  className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                    pollsTab === 'active'
+                      ? 'bg-[#FA0089] text-white'
+                      : 'bg-[#330051]/50 text-[#FEFEFE]/70 hover:bg-[#330051]/70'
+                  }`}
+                >
+                  Sondages actifs
+                </button>
+                <button
+                  onClick={() => setPollsTab('archived')}
+                  className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                    pollsTab === 'archived'
+                      ? 'bg-[#FA0089] text-white'
+                      : 'bg-[#330051]/50 text-[#FEFEFE]/70 hover:bg-[#330051]/70'
+                  }`}
+                >
+                  Sondages clôturés
+                </button>
               </div>
 
               {pollsLoading ? (
@@ -575,75 +687,113 @@ export default function ClubDetailPage() {
                 </div>
               ) : (
                 <div className="space-y-6">
-                  {polls.map(poll => {
-                    const { results, totalVotes } = calculateResults(poll);
-                    const hasVoted = !!userVotes[poll.id];
-                    const expired = isExpired(poll.endDate);
-                    
-                    return (
-                      <div key={poll.id} className="bg-[#330051]/50 border border-[#330051] rounded-xl p-6">
+                  {polls
+                    .filter(poll => {
+                      const expired = poll.endDate && new Date(poll.endDate) < new Date();
+                      if (pollsTab === 'active') {
+                        return poll.status === 'ACTIVE' && !expired;
+                      } else {
+                        return poll.status !== 'ACTIVE' || expired;
+                      }
+                    })
+                    .map(poll => {
+                      const { results, totalVotes, winner } = calculateResults(poll);
+                      const hasVoted = !!userVotes[poll.id];
+                      const expired = isExpired(poll.endDate);
+                      const isArchived = poll.status !== 'ACTIVE' || expired;
+                      
+                      return (
+                      <div key={poll.id} className={`border rounded-xl p-6 ${
+                        !isArchived
+                          ? 'bg-[#330051]/50 border-[#330051]' 
+                          : 'bg-[#330051]/30 border-[#330051]/50'
+                      }`}>
                         {/* En-tête du sondage */}
                         <div className="mb-4">
                           <div className="flex items-center gap-3 mb-2">
                             <span className="text-sm bg-[#FA0089]/20 text-[#FA0089] px-2 py-1 rounded">
                               {pollTypeLabels[poll.pollType] || poll.pollType}
                             </span>
-                            {expired && (
-                              <span className="text-sm bg-orange-500/20 text-orange-400 px-2 py-1 rounded">
-                                ⏰ Expiré
+                            {!isArchived && (
+                              <span className="text-sm bg-green-500/20 text-green-400 px-2 py-1 rounded">
+                                🟢 Actif
                               </span>
                             )}
                             {hasVoted && (
-                              <span className="text-sm bg-green-500/20 text-green-400 px-2 py-1 rounded">
+                              <span className="text-sm bg-blue-500/20 text-blue-400 px-2 py-1 rounded">
                                 ✅ Voté ({userVotes[poll.id]?.tokenPower} tokens)
                               </span>
                             )}
                           </div>
-                          <h3 className="text-xl font-bold mb-2">{poll.title}</h3>
+                          <h3 className="text-xl font-bold mb-2">
+                            {poll.title}
+                            {isArchived && winner && (
+                              <span className="ml-3 text-sm font-normal text-[#FA0089]">
+                                🏆 Gagnant: {winner.text} ({winner.votes} tokens)
+                              </span>
+                            )}
+                          </h3>
                           <p className="text-[#FEFEFE]/80 mb-3">{poll.description}</p>
                           <div className="text-sm text-[#FEFEFE]/60">
-                            Fin: {formatDate(poll.endDate)} • Min: {poll.minTokens} tokens • {totalVotes} tokens exprimés
+                            Fin: {formatDate(poll.endDate)} • {totalVotes} tokens exprimés
                           </div>
                         </div>
 
                         {/* Options et résultats */}
                         <div className="space-y-3">
-                          {results.map(option => (
-                            <div key={option.id} className="relative group">
-                              {/* Barre de progression */}
-                              <div className="bg-[#330051]/50 rounded-lg overflow-hidden">
-                                <div 
-                                  className="bg-gradient-to-r from-[#FA0089]/30 to-[#FA0089]/60 h-12 transition-all duration-500 flex items-center"
-                                  style={{ width: `${Math.max(option.percentage, 2)}%` }}
-                                >
-                                  {/* Texte des tokens visible uniquement au survol */}
-                                  <div className="pl-4 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                    {option.votes} tokens ({option.percentage.toFixed(1)}%)
+                          {results.map(option => {
+                            const isWinner = isArchived && winner && option.id === winner.id;
+                            
+                            return (
+                              <div key={option.id} className="relative group">
+                                {/* Barre de progression */}
+                                <div className="bg-[#330051]/50 rounded-lg overflow-hidden">
+                                  <div 
+                                    className={`h-12 transition-all duration-500 flex items-center ${
+                                      isWinner 
+                                        ? 'bg-gradient-to-r from-[#FA0089]/40 to-[#FA0089]/80' 
+                                        : 'bg-gradient-to-r from-[#FA0089]/30 to-[#FA0089]/60'
+                                    }`}
+                                    style={{ width: `${Math.max(option.percentage, 2)}%` }}
+                                  >
+                                    {/* Texte des tokens visible uniquement au survol pour les actifs, toujours visible pour les archivés */}
+                                    <div className={`pl-4 text-sm font-medium transition-opacity duration-300 ${
+                                      isArchived ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                                    }`}>
+                                      {option.votes} tokens ({option.percentage.toFixed(1)}%)
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                              
-                              {/* Texte de l'option */}
-                              <div className="absolute inset-0 flex items-center justify-between px-4">
-                                <span className="font-medium">{option.text}</span>
                                 
-                                {/* Bouton de vote */}
-                                {canVote(poll) && (
-                                  <button
-                                    onClick={() => vote(poll.id, option.id)}
-                                    className="bg-[#FA0089] hover:bg-[#FA0089]/80 px-4 py-1 rounded text-sm font-semibold transition ml-4"
-                                  >
-                                    Voter
-                                  </button>
+                                {/* Texte de l'option */}
+                                <div className="absolute inset-0 flex items-center justify-between px-4">
+                                  <span className={`font-medium ${
+                                    isWinner ? 'text-[#FA0089]' : ''
+                                  }`}>
+                                    {option.text}
+                                    {isWinner && ' 🏆'}
+                                  </span>
+                                  
+                                  {/* Bouton de vote */}
+                                  {canVote(poll) && (
+                                    <button
+                                      onClick={() => vote(poll.id, option.id)}
+                                      className="bg-[#FA0089] hover:bg-[#FA0089]/80 px-4 py-1 rounded text-sm font-semibold transition ml-4"
+                                    >
+                                      Voter
+                                    </button>
+                                  )}
+                                </div>
+
+                                {/* Tooltip au survol pour afficher les détails */}
+                                {!isArchived && (
+                                  <div className="absolute -top-2 left-4 bg-[#330051] border border-[#FA0089] rounded px-2 py-1 text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">
+                                    {option.votes} tokens ({option.percentage.toFixed(1)}%)
+                                  </div>
                                 )}
                               </div>
-
-                              {/* Tooltip au survol pour afficher les détails */}
-                              <div className="absolute -top-2 left-4 bg-[#330051] border border-[#FA0089] rounded px-2 py-1 text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">
-                                {option.votes} tokens ({option.percentage.toFixed(1)}%)
-                              </div>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
 
                         {/* Résumé des résultats */}
@@ -671,11 +821,9 @@ export default function ClubDetailPage() {
                         )}
 
                         {/* Message si ne peut pas voter */}
-                        {poll.status === 'ACTIVE' && !canVote(poll) && !hasVoted && (
+                        {!isArchived && !canVote(poll) && !hasVoted && (
                           <div className="mt-4 text-center text-[#FEFEFE]/60 text-sm">
-                            {!authenticated ? '🔒 Connectez-vous pour voter' :
-                             userTokens < parseInt(poll.minTokens) ? `❌ ${poll.minTokens} tokens minimum requis (vous avez ${userTokens})` :
-                             expired ? '⏰ Sondage expiré' : ''}
+                            {!authenticated ? '🔒 Connectez-vous pour voter' : ''}
                           </div>
                         )}
                       </div>

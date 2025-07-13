@@ -5,6 +5,8 @@ import { usePrivy } from '@privy-io/react-auth';
 
 export default function ClubDashboardPage() {
   const { user, authenticated } = usePrivy();
+  const [userClub, setUserClub] = useState<any>(null);
+  const [loadingClub, setLoadingClub] = useState(true);
   const [tokenData, setTokenData] = useState({
     exists: false,
     name: '',
@@ -24,19 +26,53 @@ export default function ClubDashboardPage() {
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Simuler le chargement des données du token existant
+  // Charger le club de l'utilisateur
   useEffect(() => {
-    // TODO: Récupérer les données du token depuis l'API
-    // Pour l'instant, on simule qu'il n'y a pas de token
-    setTokenData({
-      exists: false, // Changera selon si le token existe
-      name: '',
-      symbol: '',
-      totalSupply: '',
-      pricePerToken: '',
-      address: ''
-    });
-  }, []);
+    if (authenticated && user?.id) {
+      loadUserClub();
+    }
+  }, [authenticated, user]);
+
+  const loadUserClub = async () => {
+    try {
+      setLoadingClub(true);
+      // Récupérer les clubs de l'utilisateur
+      const response = await fetch(`/api/clubs?ownerId=${user?.id}`);
+      if (response.ok) {
+        const clubs = await response.json();
+        if (clubs.length > 0) {
+          setUserClub(clubs[0]); // Prendre le premier club pour l'instant
+          // Charger les données du token si elles existent
+          loadTokenData(clubs[0].id);
+        }
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement du club:', error);
+    } finally {
+      setLoadingClub(false);
+    }
+  };
+
+  const loadTokenData = async (clubId: string) => {
+    try {
+      const response = await fetch(`/api/clubs/${clubId}/token`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.hasToken) {
+          setTokenData({
+            exists: true,
+            name: data.club.name || '', // Utiliser le nom du club car tokenName n'existe pas en DB
+            symbol: data.club.tokenSymbol || '',
+            totalSupply: data.club.totalSupply || '',
+            pricePerToken: data.club.pricePerToken || '',
+            address: data.club.tokenAddress || ''
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement du token:', error);
+    }
+  };
 
   const handleInputChange = (field: string, value: string) => {
     // Pour totalSupply et pricePerToken, on ne garde que les nombres entiers
@@ -76,24 +112,49 @@ export default function ClubDashboardPage() {
 
       // TODO: Appeler le smart contract pour créer le token
       console.log('Creating token with:', {
+        clubId: userClub?.id,
         name: formData.tokenName,
         symbol: formData.tokenSymbol,
         totalSupply,
         pricePerToken
       });
 
-      // Simuler un délai pour la démo
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Appeler l'API pour créer le token
+      const response = await fetch(`/api/clubs/${userClub.id}/token`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          tokenName: formData.tokenName,
+          tokenSymbol: formData.tokenSymbol,
+          totalSupply,
+          pricePerToken,
+          ownerId: user?.id
+        })
+      });
 
-      // Mettre à jour l'état pour montrer le token créé
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erreur lors de la création du token');
+      }
+
+      const result = await response.json();
+      
+      // Mettre à jour l'état pour montrer le token en cours de déploiement
       setTokenData({
         exists: true,
-        name: formData.tokenName,
+        name: formData.tokenName, // Note: non sauvé en DB, juste pour l'affichage
         symbol: formData.tokenSymbol,
         totalSupply: formData.totalSupply,
         pricePerToken: formData.pricePerToken,
-        address: '0x1234...abcd' // Adresse simulée
+        address: result.tokenAddress // Sera "DEPLOYING_..." jusqu'au déploiement
       });
+
+      // TODO: Smart Contract Integration
+      // Une fois que vous fournissez le smart contract, remplacez cette section par :
+      // const deploymentResult = await deployTokenContract({...});
+      // puis appellez PATCH /api/clubs/${userClub.id}/token avec la vraie adresse
       
     } catch (err: any) {
       setError(err.message || 'Erreur lors de la création du token');
@@ -133,16 +194,24 @@ export default function ClubDashboardPage() {
         <div className="bg-[#330051]/30 border border-[#330051] rounded-lg p-6 mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold mb-2">Tableau de Bord Club</h1>
-              <p className="text-[#FEFEFE]/60">Gérez votre club et vos tokens</p>
+              <h1 className="text-3xl font-bold mb-2">
+                {userClub ? `${userClub.name} - Dashboard` : 'Tableau de Bord Club'}
+              </h1>
+              <p className="text-[#FEFEFE]/60">
+                {loadingClub ? 'Chargement...' : 
+                 userClub ? 'Gérez votre club et vos tokens' : 
+                 'Aucun club trouvé - Créez votre club d\'abord'}
+              </p>
             </div>
             <div className="flex items-center gap-4">
-              <button 
-                onClick={() => window.location.href = '/clubs/demo'}
-                className="bg-[#813066] hover:bg-[#813066]/80 px-4 py-2 rounded-lg font-semibold transition text-sm flex items-center gap-2"
-              >
-                👁️ Voir page publique
-              </button>
+              {userClub && (
+                <button 
+                  onClick={() => window.location.href = `/clubs/${userClub.id}`}
+                  className="bg-[#813066] hover:bg-[#813066]/80 px-4 py-2 rounded-lg font-semibold transition text-sm flex items-center gap-2"
+                >
+                  👁️ Voir page publique
+                </button>
+              )}
               <div className="text-4xl">👑</div>
             </div>
           </div>
@@ -165,17 +234,18 @@ export default function ClubDashboardPage() {
         </div>
 
         {/* Token Management Section */}
-        <div className="mb-8">
-          <div className="bg-[#330051]/30 border border-[#330051] rounded-2xl p-8">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="text-4xl">🪙</div>
-              <div>
-                <h2 className="text-2xl font-bold">Gestion du Token</h2>
-                <p className="text-[#FEFEFE]/60">
-                  {tokenData.exists ? 'Informations de votre token' : 'Créez le token de votre club'}
-                </p>
+        {userClub ? (
+          <div className="mb-8">
+            <div className="bg-[#330051]/30 border border-[#330051] rounded-2xl p-8">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="text-4xl">🪙</div>
+                <div>
+                  <h2 className="text-2xl font-bold">Gestion du Token</h2>
+                  <p className="text-[#FEFEFE]/60">
+                    {tokenData.exists ? 'Informations de votre token' : 'Créez le token de votre club'}
+                  </p>
+                </div>
               </div>
-            </div>
 
             {tokenData.exists ? (
               // Token exists - Display only mode
@@ -212,6 +282,12 @@ export default function ClubDashboardPage() {
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-[#FEFEFE]/60">Adresse du contrat :</span>
                       <span className="font-mono text-[#FA0089]">{tokenData.address}</span>
+                    </div>
+                    <div className="flex justify-between items-center mt-2">
+                      <span className="text-sm text-[#FEFEFE]/60">Prix d'une part (1%) :</span>
+                      <span className="font-semibold text-[#813066]">
+                        {(parseInt(tokenData.totalSupply) / 100 * parseInt(tokenData.pricePerToken)).toLocaleString()} CHZ
+                      </span>
                     </div>
                     <div className="flex justify-between items-center mt-2">
                       <span className="text-sm text-[#FEFEFE]/60">Valeur totale :</span>
@@ -278,22 +354,20 @@ export default function ClubDashboardPage() {
 
                 {/* Résumé */}
                 {formData.totalSupply && formData.pricePerToken && (
-                  <div className="bg-[#FA0089]/10 border border-[#FA0089] rounded-lg p-4">
-                    <h3 className="font-semibold mb-2 text-[#FA0089]">📊 Résumé</h3>
-                    <div className="grid grid-cols-3 gap-4 text-sm">
+                  <div className="bg-[#FA0089]/10 border border-[#FA0089] rounded-lg p-6">
+                    <h3 className="font-semibold mb-4 text-[#FA0089] text-center">📊 Résumé</h3>
+                    <div className="flex justify-center gap-12">
                       <div className="text-center">
-                        <div className="text-2xl font-bold text-[#FA0089]">{parseInt(formData.totalSupply).toLocaleString()}</div>
-                        <div className="text-[#FEFEFE]/60">Tokens</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-[#FA0089]">{formData.pricePerToken}</div>
-                        <div className="text-[#FEFEFE]/60">CHZ/Token</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-[#FA0089]">
-                          {(parseInt(formData.totalSupply) * parseInt(formData.pricePerToken)).toLocaleString()}
+                        <div className="text-2xl font-bold text-[#813066] mb-1">
+                          {(parseInt(formData.totalSupply) / 100 * parseInt(formData.pricePerToken)).toLocaleString()} CHZ
                         </div>
-                        <div className="text-[#FEFEFE]/60">CHZ Total</div>
+                        <div className="text-[#FEFEFE]/60 text-sm">Prix d'une part (1%)</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-[#FA0089] mb-1">
+                          {(parseInt(formData.totalSupply) * parseInt(formData.pricePerToken)).toLocaleString()} CHZ
+                        </div>
+                        <div className="text-[#FEFEFE]/60 text-sm">Valeur totale</div>
                       </div>
                     </div>
                   </div>
@@ -327,8 +401,23 @@ export default function ClubDashboardPage() {
                 </button>
               </form>
             )}
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="mb-8 bg-[#330051]/30 border border-[#330051] rounded-2xl p-8 text-center">
+            <div className="text-6xl mb-4">🏗️</div>
+            <h2 className="text-2xl font-bold mb-2">Aucun Club Trouvé</h2>
+            <p className="text-[#FEFEFE]/80 mb-6">
+              Vous devez d'abord créer un club avant de pouvoir gérer des tokens.
+            </p>
+            <button 
+              onClick={() => window.location.href = '/register-club'}
+              className="bg-[#FA0089] hover:bg-[#FA0089]/80 px-6 py-3 rounded-lg font-semibold transition"
+            >
+              🏆 Créer mon Club
+            </button>
+          </div>
+        )}
 
         {/* Other Action Cards */}
         <div className="grid md:grid-cols-2 gap-6 mb-8">
@@ -340,8 +429,13 @@ export default function ClubDashboardPage() {
               Créez des sondages et laissez vos fans participer aux décisions
             </p>
             <button 
-              onClick={() => window.location.href = '/clubs/demo/polls'}
-              className="w-full bg-[#813066] hover:bg-[#813066]/80 py-2 px-4 rounded-lg font-semibold transition"
+              onClick={() => userClub && (window.location.href = `/clubs/${userClub.id}/polls`)}
+              disabled={!userClub}
+              className={`w-full py-2 px-4 rounded-lg font-semibold transition ${
+                userClub 
+                  ? 'bg-[#813066] hover:bg-[#813066]/80' 
+                  : 'bg-[#330051]/50 cursor-not-allowed'
+              }`}
             >
               Gérer Sondages
             </button>
@@ -355,8 +449,13 @@ export default function ClubDashboardPage() {
               Modifiez les informations et paramètres de votre club
             </p>
             <button 
-              onClick={() => window.location.href = '/clubs/demo/settings'}
-              className="w-full bg-[#330051] hover:bg-[#330051]/80 py-2 px-4 rounded-lg font-semibold transition"
+              onClick={() => userClub && (window.location.href = `/clubs/${userClub.id}/settings`)}
+              disabled={!userClub}
+              className={`w-full py-2 px-4 rounded-lg font-semibold transition ${
+                userClub 
+                  ? 'bg-[#330051] hover:bg-[#330051]/80' 
+                  : 'bg-[#330051]/50 cursor-not-allowed'
+              }`}
             >
               Paramètres
             </button>

@@ -69,8 +69,12 @@ const TokenViewer3D: React.FC<TokenViewer3DProps> = ({
           />
         </Suspense>
         
-        {/* Contrôles de caméra */}
-        <OrbitControls />
+        {/* Contrôles de caméra désactivés pour éviter les déplacements */}
+        <OrbitControls 
+          enableZoom={false}
+          enablePan={false}
+          enableRotate={false}
+        />
       </Canvas>
     </div>
   );

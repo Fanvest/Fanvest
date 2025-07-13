@@ -189,22 +189,34 @@ export default function CreateTokenPage() {
             </div>
 
             {/* Résumé */}
-            {formData.totalSupply && formData.pricePerToken && (
+            {(formData.totalSupply || formData.pricePerToken) && (
               <div className="bg-[#FA0089]/10 border border-[#FA0089] rounded-lg p-4">
                 <h3 className="font-semibold mb-2 text-[#FA0089]">📊 Résumé</h3>
                 <div className="space-y-1 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-[#FEFEFE]/60">Supply totale :</span>
-                    <span>{parseInt(formData.totalSupply).toLocaleString()} tokens</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-[#FEFEFE]/60">Prix unitaire :</span>
-                    <span>{formData.pricePerToken} CHZ</span>
-                  </div>
-                  <div className="flex justify-between font-semibold text-[#FA0089]">
-                    <span>Valeur totale :</span>
-                    <span>{(parseInt(formData.totalSupply) * parseInt(formData.pricePerToken)).toLocaleString()} CHZ</span>
-                  </div>
+                  {formData.totalSupply && (
+                    <div className="flex justify-between">
+                      <span className="text-[#FEFEFE]/60">Supply totale :</span>
+                      <span>{parseInt(formData.totalSupply).toLocaleString()} tokens</span>
+                    </div>
+                  )}
+                  {formData.pricePerToken && (
+                    <div className="flex justify-between">
+                      <span className="text-[#FEFEFE]/60">Prix unitaire :</span>
+                      <span>{formData.pricePerToken} CHZ</span>
+                    </div>
+                  )}
+                  {formData.totalSupply && formData.pricePerToken && (
+                    <>
+                      <div className="flex justify-between">
+                        <span className="text-[#FEFEFE]/60">Prix d'une part (1%) :</span>
+                        <span>{(parseInt(formData.totalSupply) / 100 * parseInt(formData.pricePerToken)).toLocaleString()} CHZ</span>
+                      </div>
+                      <div className="flex justify-between font-semibold text-[#FA0089] pt-2 border-t border-[#FA0089]/20">
+                        <span>Valeur totale :</span>
+                        <span>{(parseInt(formData.totalSupply) * parseInt(formData.pricePerToken)).toLocaleString()} CHZ</span>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             )}

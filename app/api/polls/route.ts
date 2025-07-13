@@ -55,7 +55,6 @@ export async function POST(request: NextRequest) {
       pollType, 
       startDate, 
       endDate, 
-      minTokens, 
       clubId, 
       options 
     } = body;
@@ -76,7 +75,6 @@ export async function POST(request: NextRequest) {
         pollType: pollType || PollType.GOVERNANCE,
         startDate: new Date(startDate),
         endDate: new Date(endDate),
-        minTokens,
         clubId,
         options: {
           create: options.map((option: { text: string; order: number }) => ({
