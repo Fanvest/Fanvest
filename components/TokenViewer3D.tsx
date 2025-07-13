@@ -9,12 +9,14 @@ interface TokenViewer3DProps {
   bandColor?: string;
   animationEnabled?: boolean;
   texture?: string | null;
+  disableControls?: boolean; // Nouvelle prop pour désactiver complètement les contrôles
 }
 
 const TokenViewer3D: React.FC<TokenViewer3DProps> = ({ 
   bandColor = '#8B4513', 
   animationEnabled = true,
-  texture = null
+  texture = null,
+  disableControls = false
 }) => {
   // Convertir la texture base64 en objet THREE.Texture
   const [textureObj, setTextureObj] = React.useState<any>(null);
@@ -69,12 +71,14 @@ const TokenViewer3D: React.FC<TokenViewer3DProps> = ({
           />
         </Suspense>
         
-        {/* Contrôles de caméra désactivés pour éviter les déplacements */}
-        <OrbitControls 
-          enableZoom={false}
-          enablePan={false}
-          enableRotate={false}
-        />
+        {/* Contrôles de caméra conditionnels */}
+        {!disableControls && (
+          <OrbitControls 
+            enableZoom={false}
+            enablePan={false}
+            enableRotate={false}
+          />
+        )}
       </Canvas>
     </div>
   );

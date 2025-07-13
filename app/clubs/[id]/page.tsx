@@ -404,6 +404,7 @@ export default function ClubDetailPage() {
             bandColor={club.tokenBandColor || '#8B4513'}
             animationEnabled={true}
             texture={club.tokenTexture || null}
+            disableControls={true}
           />
         </div>
       )}
