@@ -125,9 +125,22 @@ export const FanStockNavbar = () => {
                 <MenuItem setActive={setActive} active={active} item="Mon Club">
                   <div className="flex flex-col space-y-2 text-sm">
                     {userClubs.map((club) => (
-                      <HoveredLink key={club.id} href={`/clubs/${club.id}`}>
-                        🏆 {club.name}
-                      </HoveredLink>
+                      <div key={club.id} className="group">
+                        <div className="font-medium text-[#FA0089] px-2 py-1 border-b border-[#FA0089]/20 mb-2">
+                          🏆 {club.name}
+                        </div>
+                        <div className="pl-4 space-y-1 mb-3">
+                          <HoveredLink href={`/clubs/${club.id}`}>
+                            👁️ Voir la page publique
+                          </HoveredLink>
+                          <HoveredLink href={`/clubs/${club.id}/polls/create`}>
+                            📊 Créer un sondage
+                          </HoveredLink>
+                          <HoveredLink href={`/clubs/${club.id}/settings`}>
+                            ⚙️ Paramètres du club
+                          </HoveredLink>
+                        </div>
+                      </div>
                     ))}
                     <div className="border-t border-[#FA0089]/30 pt-2 mt-2">
                       <HoveredLink href="/register-club">
