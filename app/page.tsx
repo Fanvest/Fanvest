@@ -58,7 +58,7 @@ export default function Home() {
             Own Your Local Club
           </h1>
           <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto">
-            FanStock brings real ownership to 50,000+ amateur football clubs across Europe. 
+            Fanvest brings real ownership to 50,000+ amateur football clubs across Europe. 
             Buy tokens, vote on decisions, share revenues.
           </p>
           <div className="flex justify-center">
@@ -132,7 +132,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Why FanStock */}
+        {/* Why Fanvest */}
         <div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-2xl p-8 md:p-12 mb-20 shadow-lg">
           <h2 className="text-3xl md:text-4xl font-bold mb-8 text-gray-900">
             Why Amateur Clubs?

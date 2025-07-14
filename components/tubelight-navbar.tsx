@@ -58,6 +58,7 @@ export function NavBar({ items, className }: NavBarProps) {
               <span className="md:hidden">
                 <Icon size={18} strokeWidth={2.5} />
               </span>
+              <p className="md:hidden">cqcq</p>
               {isActive && (
                 <motion.div
                   layoutId="lamp"

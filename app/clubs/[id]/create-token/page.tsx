@@ -103,7 +103,7 @@ export default function CreateTokenPage() {
                 onClick={() => window.location.href = '/'}
                 className="text-2xl font-bold hover:text-accent-primary transition"
               >
-                FanStock
+                Fanvest
               </button>
               <span className="text-text-primary/40">/</span>
               <span className="text-text-primary/80">Create Token</span>

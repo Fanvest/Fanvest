@@ -31,7 +31,7 @@ async function createDemoClub() {
           id: 'demo',
           name: 'FC Demo',
           location: 'Paris, France',
-          description: 'Club de démonstration pour FanStock',
+          description: 'Club de démonstration pour Fanvest',
           founded: 2020,
           ownerId: demoUser.privyId
         }

@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "FanStock - Own Your Local Club",
+  title: "Fanvest - Own Your Local Club",
   description: "Bringing real ownership to 50,000+ amateur football clubs across Europe. Buy tokens, vote on decisions, share revenues.",
 };
 

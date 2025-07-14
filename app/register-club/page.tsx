@@ -194,7 +194,7 @@ export default function RegisterClubPage() {
             <div className="text-3xl">⚽</div>
             <div>
               <h1 className="text-2xl font-bold">Register Your Club</h1>
-              <p className="text-gray-600">Join the FanStock revolution</p>
+              <p className="text-gray-600">Join the Fanvest revolution</p>
             </div>
           </div>
 

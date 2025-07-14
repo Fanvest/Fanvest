@@ -97,7 +97,7 @@ export default function ExplorePage() {
                 className="text-2xl font-bold hover:opacity-80 transition"
                 style={{color: '#fa0089'}}
               >
-                FanStock
+                Fanvest
               </button>
               <span className="text-gray-400">/</span>
               <span className="text-gray-600">Explore Clubs</span>

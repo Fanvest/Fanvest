@@ -20,7 +20,7 @@ export default function HowItWorksPage() {
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4">❓ Comment ça marche</h1>
           <p className="text-sub/80 text-lg">
-            Découvrez le fonctionnement de FanStock en 3 étapes simples
+            Découvrez le fonctionnement de Fanvest en 3 étapes simples
           </p>
         </div>
         

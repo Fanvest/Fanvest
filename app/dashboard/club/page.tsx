@@ -224,7 +224,7 @@ export default function ClubDashboardPage() {
                   className="text-xl font-bold hover:opacity-80 transition"
                   style={{color: '#fa0089'}}
                 >
-                  FanStock
+                  Fanvest
                 </button>
                 <div className="text-sm text-gray-600 font-medium">
                   {userClub ? `Dashboard · ${userClub.name}` : 'Club Dashboard'}
